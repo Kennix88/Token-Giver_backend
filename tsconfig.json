@@ -12,8 +12,11 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["*"],
+      "@core/*": ["src/core/*"],
+      "@modules/*": ["src/modules/*"],
+      "@shared/*": ["src/shared/*"],
       "@prisma/generated": ["prisma/generated"],
-      "@prisma/generated/*": ["prisma/generated/*"]
+      "@prisma/generated/*": ["prisma/generated/*"],
     },
     "incremental": true,
     "skipLibCheck": true,
