@@ -1,6 +1,6 @@
 import { CoreModule } from '@core/core.module'
 import { RedisService } from '@core/redis/redis.service'
-import { ValidationPipe } from '@nestjs/common'
+import { Logger, ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { ms, type StringValue } from '@shared/utils/ms.util'
@@ -9,6 +9,7 @@ import RedisStore from 'connect-redis'
 import * as cookieParser from 'cookie-parser'
 import * as session from 'express-session'
 import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js'
+import { LoggerErrorInterceptor, Logger as PinoLogger } from 'nestjs-pino'
 
 async function bootstrap() {
 	const app = await NestFactory.create(CoreModule, { rawBody: true })
@@ -20,6 +21,9 @@ async function bootstrap() {
 		maxFileSize: 1000000,
 		maxFiles: 10,
 	})
+
+	app.useLogger(app.get(PinoLogger))
+	app.useGlobalInterceptors(new LoggerErrorInterceptor())
 
 	app.use(cookieParser(config.getOrThrow<string>('COOKIES_SECRET')))
 	app.use(config.getOrThrow<string>('GRAPHQL_PREFIX'), grapgqlUpload)
@@ -55,6 +59,17 @@ async function bootstrap() {
 		credentials: true,
 		exposedHeaders: ['set-cookie'],
 	})
+	app.enableShutdownHooks()
 	await app.listen(config.getOrThrow<number>('APPLICATION_PORT') || 3000)
+
+	return app.getUrl()
 }
-bootstrap()
+
+void (async () => {
+	try {
+		const url = await bootstrap()
+		Logger.log(url, 'Bootstrap')
+	} catch (error) {
+		Logger.error(error, 'Bootstrap')
+	}
+})()
