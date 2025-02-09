@@ -8,6 +8,7 @@ import { parseBoolean } from '@shared/utils/parse-boolean.util'
 import RedisStore from 'connect-redis'
 import * as cookieParser from 'cookie-parser'
 import * as session from 'express-session'
+import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js'
 
 async function bootstrap() {
 	const app = await NestFactory.create(CoreModule, { rawBody: true })
@@ -15,7 +16,13 @@ async function bootstrap() {
 	const config = app.get(ConfigService)
 	const redis = app.get(RedisService)
 
+	const grapgqlUpload = graphqlUploadExpress({
+		maxFileSize: 1000000,
+		maxFiles: 10,
+	})
+
 	app.use(cookieParser(config.getOrThrow<string>('COOKIES_SECRET')))
+	app.use(config.getOrThrow<string>('GRAPHQL_PREFIX'), grapgqlUpload)
 
 	app.useGlobalPipes(
 		new ValidationPipe({
