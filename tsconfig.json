@@ -13,6 +13,7 @@
     "paths": {
       "@/*": ["*"],
       "@core/*": ["src/core/*"],
+      "@integrations/*": ["src/integrations/*"],
       "@modules/*": ["src/modules/*"],
       "@shared/*": ["src/shared/*"],
       "@prisma/generated": ["prisma/generated"],

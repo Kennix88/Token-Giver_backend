@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 
+import { TelegramModule } from '@/src/integrations/telegram/telegram.module'
 import { graphQLConfig } from '@core/configs/graphql.config'
 import { pinoConfig } from '@core/configs/pino.config'
 import { CoreResolver } from '@core/core.resolver'
@@ -26,6 +27,7 @@ import { LoggerModule } from 'nestjs-pino'
 		}),
 		PrismaConnectModule,
 		RedisModule,
+		TelegramModule,
 	],
 	controllers: [],
 	providers: [CoreResolver],
