@@ -51,6 +51,7 @@
     "i18n-iso-countries": "^7.12.0",
     "ioredis": "^5.4.1",
     "livekit-server-sdk": "1.2.7",
+    "nestjs-i18n": "^10.5.0",
     "nestjs-pino": "^4.3.0",
     "nestjs-prisma": "^0.24.0",
     "nestjs-telegraf": "^2.8.1",
