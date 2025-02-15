@@ -43,6 +43,21 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   telegramMetaData UserTelegramData?
+  language         Language          @relation(fields: [languageId], references: [id])
+  languageId       Int               @map("language_id")
 
   @@map("users")
+}
+
+model Language {
+  id         Int    @id @default(autoincrement())
+  name       String
+  nativeName String @map("native_name")
+  iso6391    String @unique @map("iso_639_1")
+  iso6392    String @unique @map("iso_639_2")
+  iso6393    String @unique @map("iso_639_3")
+
+  users User[]
+
+  @@map("language")
 }
