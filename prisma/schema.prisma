@@ -38,9 +38,15 @@ model User {
   isVerified Boolean @default(false) @map("is_verified")
   coins      Float   @default(0)
   gems       Float   @default(0)
+  isInited   Boolean @default(false)
+  role       Role    @default(USER)
+  isBanned   Boolean @default(false)
+  isDeleted  Boolean @default(false)
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  banExpiredAt DateTime? @map("banned_expired_at")
+  deletedAt    DateTime? @map("deleted_at")
 
   telegramMetaData UserTelegramData?
   language         Language          @relation(fields: [languageId], references: [id])
@@ -60,4 +66,20 @@ model Language {
   users User[]
 
   @@map("language")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+model Currency {
+  id         Int     @id @default(autoincrement())
+  name       String
+  symbol     String
+  key        String  @unique
+  iso4217Num String? @unique @map("iso_4217_num")
+
+  @@map("currency")
 }
