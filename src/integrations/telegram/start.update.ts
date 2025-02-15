@@ -20,6 +20,8 @@ export class StartUpdate {
 		try {
 			if (ctx.chat?.type !== 'private' || !ctx.from) return
 
+			console.log(JSON.stringify(ctx.from, null, 2))
+
 			await ctx.replyWithHTML(
 				this.i18n.t('telegraf.start.welcome', {
 					...(ctx.from.language_code && { lang: ctx.from.language_code }),

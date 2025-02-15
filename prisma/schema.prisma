@@ -8,15 +8,41 @@ datasource db {
   url      = env("POSTGRES_URI")
 }
 
-model User {
-  id String @id @default(uuid())
-
-  telegramId String @unique @map("telegram_id")
-
-  isVerified Boolean @default(false) @map("is_verified")
+model UserTelegramData {
+  id                    String  @id @default(cuid())
+  isLive                Boolean @default(false) @map("is_live")
+  isRtl                 Boolean @default(false) @map("is_rtl")
+  isPremium             Boolean @default(false) @map("is_premium")
+  isBot                 Boolean @default(false) @map("is_bot")
+  firstName             String  @map("first_name")
+  lastName              String? @map("last_name")
+  username              String?
+  languageCode          String  @map("language_code")
+  photoUrl              String? @map("photo_url")
+  addedToAttachmentMenu Boolean @default(false) @map("added_to_attachment_menu")
+  allowsWriteToPm       Boolean @default(false) @map("allows_write_to_pm")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique @map("user_id")
+
+  @@map("user_telegram_data")
+}
+
+model User {
+  id         String  @id @default(cuid())
+  telegramId String  @unique @map("telegram_id")
+  tonWallet  String  @unique @map("ton_wallet")
+  isVerified Boolean @default(false) @map("is_verified")
+  coins      Float   @default(0)
+  gems       Float   @default(0)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  telegramMetaData UserTelegramData?
 
   @@map("users")
 }
