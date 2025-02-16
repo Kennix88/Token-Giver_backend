@@ -88,7 +88,7 @@ model LeaderboardByReferrals {
 
 model KingTheHill {
   key                 String    @id @default("default")
-  priceInTgStars      Int       @default(100)
+  priceInTgStars      Int       @default(100) @map("price_in_tg_stars")
   maxDays             Int       @default(30) @map("max_days")
   rewardCoinsInMinute Float     @default(1) @map("reward_coins_in_minute")
   isKing              Boolean   @default(false) @map("is_king")
@@ -123,17 +123,17 @@ model UserTelegramData {
 }
 
 model User {
-  id         String  @id @default(uuid())
-  telegramId String  @unique @map("telegram_id")
-  tonWallet  String  @unique @map("ton_wallet")
-  isPremium  Boolean @default(false) @map("is_premium")
-  coins      Float   @default(0)
-  gems       Float   @default(0)
-  isInited   Boolean @default(false)
-  role       Role    @default(USER)
-  isBanned   Boolean @default(false)
-  isDeleted  Boolean @default(false)
-  startDay   Int     @default(1)
+  id         String   @id @default(uuid())
+  telegramId String   @unique @map("telegram_id")
+  tonWallet  String   @unique @map("ton_wallet")
+  isPremium  Boolean  @default(false) @map("is_premium")
+  coins      Float    @default(0)
+  gems       Float    @default(0)
+  isInited   Boolean  @default(false)
+  role       RoleEnum @default(USER)
+  isBanned   Boolean  @default(false)
+  isDeleted  Boolean  @default(false)
+  startDay   Int      @default(1)
 
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
@@ -157,6 +157,31 @@ model User {
   @@map("users")
 }
 
+enum RoleEnum {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+model Reward {
+  id         String           @id @default(uuid())
+  coins      Float            @default(0)
+  bonusCoins Float            @default(0)
+  gems       Float            @default(0)
+  bonusGems  Float            @default(0)
+  reason     ReasonRewardEnum
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("reward")
+}
+
+enum ReasonRewardEnum {
+  REFERRAL
+  TASK
+  BOOST
+}
+
 model Language {
   id         String @id @default(uuid())
   name       String
@@ -168,12 +193,6 @@ model Language {
   users User[]
 
   @@map("language")
-}
-
-enum Role {
-  SUPER_ADMIN
-  ADMIN
-  USER
 }
 
 model Currency {
@@ -196,9 +215,9 @@ model BoostScore {
   @@map("boost_score")
 }
 
-model DaysRewards {
+model DaysReward {
   day   Int   @id @default(1)
   coins Float @default(0)
 
-  @@map("days_rewards")
+  @@map("days_reward")
 }
