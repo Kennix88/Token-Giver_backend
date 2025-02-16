@@ -8,8 +8,30 @@ datasource db {
   url      = env("POSTGRES_URI")
 }
 
+model Settings {
+  key          String  @id @default("default")
+  gameIsActive Boolean @default(false) @map("game_is_active")
+  tgStarsInUSD Float   @default(0.013) @map("tg_stars_in_usd")
+  premiumPrice Float   @default(10) @map("plus_status_price")
+
+  @@map("settings")
+}
+
+model KingTheHill {
+  key                 String  @id @default("default")
+  price               Float   @default(1)
+  maxDays             Int     @default(30) @map("max_days")
+  rewardCoinsInMinute Float   @default(1) @map("reward_coins_in_minute")
+  isKing              Boolean @default(false) @map("is_king")
+
+  user   User    @relation(fields: [userId], references: [id])
+  userId String?
+
+  @@map("king_the_hill")
+}
+
 model UserTelegramData {
-  id                    String  @id @default(cuid())
+  id                    String  @id @default(uuid())
   isLive                Boolean @default(false) @map("is_live")
   isRtl                 Boolean @default(false) @map("is_rtl")
   isPremium             Boolean @default(false) @map("is_premium")
@@ -26,16 +48,16 @@ model UserTelegramData {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   user   User   @relation(fields: [userId], references: [id])
-  userId String @unique @map("user_id")
+  userId String
 
   @@map("user_telegram_data")
 }
 
 model User {
-  id         String  @id @default(cuid())
+  id         String  @id @default(uuid())
   telegramId String  @unique @map("telegram_id")
   tonWallet  String  @unique @map("ton_wallet")
-  isVerified Boolean @default(false) @map("is_verified")
+  isPremium  Boolean @default(false) @map("is_premium")
   coins      Float   @default(0)
   gems       Float   @default(0)
   isInited   Boolean @default(false)
@@ -43,20 +65,23 @@ model User {
   isBanned   Boolean @default(false)
   isDeleted  Boolean @default(false)
 
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  banExpiredAt DateTime? @map("banned_expired_at")
-  deletedAt    DateTime? @map("deleted_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  premiumExpiredAt DateTime? @map("plus_status_expired_at")
+  banExpiredAt     DateTime? @map("banned_expired_at")
+  deletedAt        DateTime? @map("deleted_at")
 
-  telegramMetaData UserTelegramData?
-  language         Language          @relation(fields: [languageId], references: [id])
-  languageId       Int               @map("language_id")
+  kingTheHill    KingTheHill?     @map("king_the_hill")
+  telegramData   UserTelegramData @relation(fields: [telegramDataId], references: [id])
+  telegramDataId String?          @unique @map("telegram_data_id")
+  language       Language         @relation(fields: [languageId], references: [id])
+  languageId     String           @map("language_id")
 
   @@map("users")
 }
 
 model Language {
-  id         Int    @id @default(autoincrement())
+  id         String @id @default(uuid())
   name       String
   nativeName String @map("native_name")
   iso6391    String @unique @map("iso_639_1")
@@ -75,7 +100,7 @@ enum Role {
 }
 
 model Currency {
-  id         Int     @id @default(autoincrement())
+  id         String  @id @default(uuid())
   name       String
   symbol     String
   key        String  @unique
