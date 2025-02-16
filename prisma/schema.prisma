@@ -33,12 +33,66 @@ model Settings {
   @@map("settings")
 }
 
+model Leaderboards {
+  id        String                   @id @default(uuid())
+  coins     LeaderboardByCoins[]
+  gems      LeaderboardByGems[]
+  referrals LeaderboardByReferrals[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("liderboard")
+}
+
+model LeaderboardByCoins {
+  id     String @id @default(uuid())
+  score  Int    @default(1)
+  shift  Int    @default(0)
+  amount Float
+
+  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id])
+  leaderboardId String       @unique @map("leaderboard_id")
+  user          User         @relation(fields: [userId], references: [id])
+  userId        String       @unique @map("user_id")
+
+  @@map("liderboard_by_coins")
+}
+
+model LeaderboardByGems {
+  id     String @id @default(uuid())
+  score  Int    @default(1)
+  shift  Int    @default(0)
+  amount Float
+
+  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id])
+  leaderboardId String       @unique @map("leaderboard_id")
+  user          User         @relation(fields: [userId], references: [id])
+  userId        String       @unique @map("user_id")
+
+  @@map("liderboard_by_gems")
+}
+
+model LeaderboardByReferrals {
+  id     String @id @default(uuid())
+  score  Int    @default(1)
+  shift  Int    @default(0)
+  amount Float
+
+  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id])
+  leaderboardId String       @unique @map("leaderboard_id")
+  user          User         @relation(fields: [userId], references: [id])
+  userId        String       @unique @map("user_id")
+
+  @@map("liderboard_by_referrals")
+}
+
 model KingTheHill {
-  key                 String  @id @default("default")
-  priceInTgStars      Int     @default(100)
-  maxDays             Int     @default(30) @map("max_days")
-  rewardCoinsInMinute Float   @default(1) @map("reward_coins_in_minute")
-  isKing              Boolean @default(false) @map("is_king")
+  key                 String    @id @default("default")
+  priceInTgStars      Int       @default(100)
+  maxDays             Int       @default(30) @map("max_days")
+  rewardCoinsInMinute Float     @default(1) @map("reward_coins_in_minute")
+  isKing              Boolean   @default(false) @map("is_king")
+  startedAt           DateTime? @map("started_at")
 
   user   User?   @relation(fields: [userId], references: [id])
   userId String? @unique @map("user_id")
@@ -88,11 +142,14 @@ model User {
   banExpiredAt     DateTime? @map("banned_expired_at")
   deletedAt        DateTime? @map("deleted_at")
 
-  kingTheHill    KingTheHill?
-  telegramData   UserTelegramData? @relation(fields: [telegramDataId], references: [id])
-  telegramDataId String?           @unique @map("telegram_data_id")
-  language       Language          @relation(fields: [languageId], references: [id])
-  languageId     String            @map("language_id")
+  kingTheHill            KingTheHill?
+  telegramData           UserTelegramData?       @relation(fields: [telegramDataId], references: [id])
+  telegramDataId         String?                 @unique @map("telegram_data_id")
+  language               Language                @relation(fields: [languageId], references: [id])
+  languageId             String                  @map("language_id")
+  leaderboardByCoins     LeaderboardByCoins?
+  leaderboardByGems      LeaderboardByGems?
+  leaderboardByReferrals LeaderboardByReferrals?
 
   @@map("users")
 }
