@@ -9,10 +9,17 @@ datasource db {
 }
 
 model Settings {
-  key          String  @id @default("default")
-  gameIsActive Boolean @default(false) @map("game_is_active")
-  tgStarsInUSD Float   @default(0.013) @map("tg_stars_in_usd")
-  premiumPrice Float   @default(10) @map("plus_status_price")
+  key                   String  @id @default("default")
+  gameIsActive          Boolean @default(false) @map("game_is_active")
+  gameName              String  @default("Token Giver") @map("game_name")
+  gameLogo              String? @map("game_logo")
+  gamePreviewImage      String? @map("game_preview_image")
+  tgChannelUrl          String? @map("tg_channel_url")
+  tgChatUrl             String? @map("tg_chat_url")
+  tgSupportUrl          String? @map("tg_support_url")
+  tgStarsInUSD          Float   @default(0.013) @map("tg_stars_in_usd")
+  premiumPrice          Float   @default(10) @map("premium_price")
+  lastDayRewardIsCyclic Boolean @default(true) @map("last_day_reward_is_cyclic")
 
   @@map("settings")
 }
@@ -24,8 +31,8 @@ model KingTheHill {
   rewardCoinsInMinute Float   @default(1) @map("reward_coins_in_minute")
   isKing              Boolean @default(false) @map("is_king")
 
-  user   User    @relation(fields: [userId], references: [id])
-  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String? @unique @map("user_id")
 
   @@map("king_the_hill")
 }
@@ -47,8 +54,7 @@ model UserTelegramData {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  user User?
 
   @@map("user_telegram_data")
 }
@@ -64,18 +70,20 @@ model User {
   role       Role    @default(USER)
   isBanned   Boolean @default(false)
   isDeleted  Boolean @default(false)
+  startDay   Int     @default(1)
 
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
-  premiumExpiredAt DateTime? @map("plus_status_expired_at")
+  lastStartedAt    DateTime? @map("last_started_at")
+  premiumExpiredAt DateTime? @map("premium_expired_at")
   banExpiredAt     DateTime? @map("banned_expired_at")
   deletedAt        DateTime? @map("deleted_at")
 
-  kingTheHill    KingTheHill?     @map("king_the_hill")
-  telegramData   UserTelegramData @relation(fields: [telegramDataId], references: [id])
-  telegramDataId String?          @unique @map("telegram_data_id")
-  language       Language         @relation(fields: [languageId], references: [id])
-  languageId     String           @map("language_id")
+  kingTheHill    KingTheHill?
+  telegramData   UserTelegramData? @relation(fields: [telegramDataId], references: [id])
+  telegramDataId String?           @unique @map("telegram_data_id")
+  language       Language          @relation(fields: [languageId], references: [id])
+  languageId     String            @map("language_id")
 
   @@map("users")
 }
@@ -107,4 +115,11 @@ model Currency {
   iso4217Num String? @unique @map("iso_4217_num")
 
   @@map("currency")
+}
+
+model DaysRewards {
+  day   Int   @id @default(1)
+  coins Float @default(0)
+
+  @@map("days_rewards")
 }
