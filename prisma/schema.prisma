@@ -142,6 +142,9 @@ model User {
   banExpiredAt     DateTime? @map("banned_expired_at")
   deletedAt        DateTime? @map("deleted_at")
 
+  referrals              User[]                  @relation("UserReferral")
+  inviter                User?                   @relation("UserReferral", fields: [inviterId], references: [id])
+  inviterId              String?                 @map("inviter_id")
   kingTheHill            KingTheHill?
   telegramData           UserTelegramData?       @relation(fields: [telegramDataId], references: [id])
   telegramDataId         String?                 @unique @map("telegram_data_id")
