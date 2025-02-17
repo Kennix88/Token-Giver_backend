@@ -142,6 +142,7 @@ model User {
   banExpiredAt     DateTime? @map("banned_expired_at")
   deletedAt        DateTime? @map("deleted_at")
 
+  payments               Payments[]
   referrals              User[]                  @relation("UserReferral")
   inviter                User?                   @relation("UserReferral", fields: [inviterId], references: [id])
   inviterId              String?                 @map("inviter_id")
@@ -202,6 +203,8 @@ model Currency {
   key        String  @unique
   iso4217Num String? @unique @map("iso_4217_num")
 
+  payments Payments[]
+
   @@map("currency")
 }
 
@@ -220,4 +223,47 @@ model DaysReward {
   coins Float @default(0)
 
   @@map("days_reward")
+}
+
+model Payments {
+  id     String            @id @default(cuid())
+  status PaymentStatusEnum @default(PENDING)
+  type   PaymentTypeEnum   @default(ONE_TIME)
+  method PaymentMethodEnum @default(TG_STARS)
+
+  amount       String @default("0")
+  exchangeRate String @default("0")
+
+  token   String  @unique
+  linkPay String?
+  details Json?   @db.JsonB
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String   @map("user_id")
+  currency   Currency @relation(fields: [currencyId], references: [id])
+  currencyId String   @map("currency_id")
+
+  @@map("payments")
+}
+
+enum PaymentStatusEnum {
+  PENDING
+  SUCCESS
+  CANCELED
+  FAILED
+  EXPIRED
+}
+
+enum PaymentTypeEnum {
+  SUBSCRIPTION
+  ONE_TIME
+}
+
+enum PaymentMethodEnum {
+  TG_STARS
+  TON
+  USDT
 }
