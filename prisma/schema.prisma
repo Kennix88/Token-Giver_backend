@@ -126,7 +126,6 @@ model User {
   id         String   @id @default(uuid())
   telegramId String   @unique @map("telegram_id")
   tonWallet  String   @unique @map("ton_wallet")
-  isPremium  Boolean  @default(false) @map("is_premium")
   coins      Float    @default(0)
   gems       Float    @default(0)
   isInited   Boolean  @default(false)
@@ -135,12 +134,11 @@ model User {
   isDeleted  Boolean  @default(false)
   startDay   Int      @default(1)
 
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-  lastStartedAt    DateTime? @map("last_started_at")
-  premiumExpiredAt DateTime? @map("premium_expired_at")
-  banExpiredAt     DateTime? @map("banned_expired_at")
-  deletedAt        DateTime? @map("deleted_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  lastStartedAt DateTime? @map("last_started_at")
+  banExpiredAt  DateTime? @map("banned_expired_at")
+  deletedAt     DateTime? @map("deleted_at")
 
   payments               Payments[]
   referrals              User[]                  @relation("UserReferral")
@@ -149,6 +147,8 @@ model User {
   kingTheHill            KingTheHill?
   telegramData           UserTelegramData?       @relation(fields: [telegramDataId], references: [id])
   telegramDataId         String?                 @unique @map("telegram_data_id")
+  premiumSubscription    PremiumSubscription?    @relation(fields: [premiumSubscriptionId], references: [id])
+  premiumSubscriptionId  String?                 @unique @map("premium_subscription_id")
   language               Language                @relation(fields: [languageId], references: [id])
   languageId             String                  @map("language_id")
   leaderboardByCoins     LeaderboardByCoins?
@@ -225,8 +225,22 @@ model DaysReward {
   @@map("days_reward")
 }
 
+model PremiumSubscription {
+  id       String  @id @default(uuid())
+  isActive Boolean @default(false)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  expiredAt DateTime @map("expired_at")
+
+  user     User?
+  payments Payments[]
+
+  @@map("premium_subscription")
+}
+
 model Payments {
-  id     String            @id @default(cuid())
+  id     String            @id @default(uuid())
   status PaymentStatusEnum @default(PENDING)
   type   PaymentTypeEnum   @default(ONE_TIME)
   method PaymentMethodEnum @default(TG_STARS)
@@ -234,17 +248,19 @@ model Payments {
   amount       String @default("0")
   exchangeRate String @default("0")
 
-  token   String  @unique
+  token   String? @unique
   linkPay String?
   details Json?   @db.JsonB
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String   @map("user_id")
-  currency   Currency @relation(fields: [currencyId], references: [id])
-  currencyId String   @map("currency_id")
+  user                  User                 @relation(fields: [userId], references: [id])
+  userId                String               @map("user_id")
+  currency              Currency             @relation(fields: [currencyId], references: [id])
+  currencyId            String               @map("currency_id")
+  premiumSubscription   PremiumSubscription? @relation(fields: [premiumSubscriptionId], references: [id])
+  premiumSubscriptionId String?              @map("premium_subscription_id")
 
   @@map("payments")
 }
