@@ -154,6 +154,7 @@ model User {
   leaderboardByCoins     LeaderboardByCoins?
   leaderboardByGems      LeaderboardByGems?
   leaderboardByReferrals LeaderboardByReferrals?
+  tasksProgress          TaskProgress[]
 
   @@map("users")
 }
@@ -191,7 +192,9 @@ model Language {
   iso6392    String @unique @map("iso_639_2")
   iso6393    String @unique @map("iso_639_3")
 
-  users User[]
+  users           User[]
+  taskTitles      TaskTitles[]
+  taskDecriptions TaskDecriptions[]
 
   @@map("language")
 }
@@ -282,4 +285,118 @@ enum PaymentMethodEnum {
   TG_STARS
   TON
   USDT
+}
+
+model Partner {
+  id                 String  @id @default(uuid())
+  name               String
+  logoUrl            String
+  backgroundImageUrl String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  Tasks Task[]
+
+  @@map("partner")
+}
+
+model TaskTitles {
+  id    String @id @default(uuid())
+  title String
+
+  language   Language @relation(fields: [languageId], references: [id])
+  languageId String   @map("language_id")
+  task       Task     @relation(fields: [taskId], references: [id])
+  taskId     String   @map("task_id")
+
+  @@map("task_title")
+}
+
+model TaskDecriptions {
+  id          String @id @default(uuid())
+  description String
+
+  language   Language @relation(fields: [languageId], references: [id])
+  languageId String   @map("language_id")
+  task       Task     @relation(fields: [taskId], references: [id])
+  taskId     String   @map("task_id")
+
+  @@map("task_descriptons")
+}
+
+model Task {
+  id             String            @id @default(uuid())
+  titleKey       String?
+  titles         TaskTitles[]
+  descriptionKey String?
+  descriptions   TaskDecriptions[]
+
+  coins              Float        @default(0)
+  gems               Float        @default(0)
+  icon               String
+  type               TaskTypeEnum @default(LINK_TIME)
+  data               String
+  duractionInSeconds Int?
+  checkTgChatId      String?
+
+  isPremium Boolean          @default(false)
+  isHiRisk  Boolean          @default(false)
+  category  TaskCategoryEnum
+
+  isProgressing Boolean @default(false)
+  progressKey   String?
+  progressValue Float?
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  experiredAt DateTime? @map("expired_at")
+
+  partner   Partner?       @relation(fields: [partnerId], references: [id])
+  partnerId String?        @map("partner_id")
+  progress  TaskProgress[]
+
+  @@map("task")
+}
+
+enum TaskCategoryEnum {
+  GAME
+  DAILY
+  PARTNER
+  ACHIEVEMENT
+}
+
+enum TaskTypeEnum {
+  CUSTOM_EMOJI
+  EMOJI_NAME
+  STRING_NAME
+  TG_SUBSCRIPTION
+  TG_BOOST
+  TG_REACTION
+  WALLET
+  REFERRAL
+  LINK_TIME
+}
+
+model TaskProgress {
+  id     String                 @id @default(uuid())
+  status TaskProgressStatusEnum
+  value  Float
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String @map("task_id")
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  @@map("task_progress")
+}
+
+enum TaskProgressStatusEnum {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
 }
