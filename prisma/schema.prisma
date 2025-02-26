@@ -12,16 +12,18 @@ model Settings {
   key          String  @id @default("default")
   gameIsActive Boolean @default(false) @map("game_is_active")
 
-  gameName         String  @default("Token Giver") @map("game_name")
-  gameLogo         String? @map("game_logo")
-  gamePreviewImage String? @map("game_preview_image")
-  tgChannelUrl     String? @map("tg_channel_url")
-  tgChatUrl        String? @map("tg_chat_url")
-  tgSupportUrl     String? @map("tg_support_url")
+  gameName            String  @default("Token Giver") @map("game_name")
+  gameLogoUrl         String? @map("game_logo")
+  gamePreviewImageUrl String? @map("game_preview_image")
+  tgChannelUrl        String? @map("tg_channel_url")
+  tgChatUrl           String? @map("tg_chat_url")
+  tgSupportUrl        String? @map("tg_support_url")
 
   tgStarsInUSD          Float   @default(0.013) @map("tg_stars_in_usd")
-  premiumPriceInTgStars Int     @default(1000) @map("premium_price_in_tg_stars")
   lastDayRewardIsCyclic Boolean @default(true) @map("last_day_reward_is_cyclic")
+
+  premiumPriceInTgStars Int   @default(1000) @map("premium_price_in_tg_stars")
+  premiumDiscount       Float @default(1) @map("premium_discount")
 
   inviteUserRewardCoins        Float @default(3000) @map("invite_reward_coins")
   inviteUserRewardGems         Float @default(0) @map("invite_reward_gems")
@@ -215,7 +217,7 @@ model BoostScore {
   id             Int     @id @default(autoincrement())
   priceInTgStars Int     @map("price_in_tg_stars")
   coins          Float
-  discount       Float
+  discount       Float   @default(1)
   isActive       Boolean @default(true) @map("is_active")
 
   @@map("boost_score")
