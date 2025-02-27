@@ -102,6 +102,7 @@ model LeaderboardByReferrals {
 model KingTheHill {
   key                 String    @id @default("default")
   priceInTgStars      Int       @default(100) @map("price_in_tg_stars")
+  discount            Float     @default(1)
   maxDays             Int       @default(30) @map("max_days")
   rewardCoinsInMinute Float     @default(1) @map("reward_coins_in_minute")
   isKing              Boolean   @default(false) @map("is_king")
