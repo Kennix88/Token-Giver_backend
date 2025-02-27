@@ -35,6 +35,17 @@ model Settings {
   @@map("settings")
 }
 
+model CurrencyRates {
+  key           String @id @default("default")
+  rates         Json?  @db.JsonB
+  coinmarketcap Json?  @db.JsonB
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("currency_rates")
+}
+
 model Leaderboards {
   id        String                   @id @default(uuid())
   coins     LeaderboardByCoins[]
