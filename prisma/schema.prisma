@@ -229,9 +229,11 @@ model BoostScore {
   id             Int     @id @default(autoincrement())
   priceInTgStars Int     @map("price_in_tg_stars")
   coins          Float
+  bonus          Float   @default(1)
   discount       Float   @default(1)
   isActive       Boolean @default(true) @map("is_active")
 
+  // paymens
   @@map("boost_score")
 }
 
