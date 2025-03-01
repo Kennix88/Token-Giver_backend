@@ -1,4 +1,4 @@
-import { PrismaConnectService } from '@core/prisma/prismaConnect.service'
+import { PrismaConnectService } from '@core/prisma/prisma-connect.service'
 import { Global, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PrismaModule } from 'nestjs-prisma'
