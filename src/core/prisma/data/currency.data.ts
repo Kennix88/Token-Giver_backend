@@ -384,12 +384,6 @@ export const CurrencyData = [
 		iso4217Num: null,
 	},
 	{
-		name: 'Tether',
-		key: 'USDT',
-		symbol: 'USDT',
-		iso4217Num: null,
-	},
-	{
 		name: 'USDC',
 		key: 'USDC',
 		symbol: 'USDC',
@@ -462,12 +456,6 @@ export const CurrencyData = [
 		iso4217Num: null,
 	},
 	{
-		name: 'Toncoin',
-		key: 'TON',
-		symbol: 'TON',
-		iso4217Num: null,
-	},
-	{
 		name: 'TRON',
 		key: 'TRX',
 		symbol: 'TRX',
@@ -486,8 +474,20 @@ export const CurrencyData = [
 		iso4217Num: null,
 	},
 	{
+		name: 'Toncoin',
+		key: 'TON',
+		symbol: 'TON',
+		iso4217Num: null,
+	},
+	{
+		name: 'Tether',
+		key: 'USDT',
+		symbol: 'USDT',
+		iso4217Num: null,
+	},
+	{
 		name: 'Telegram Stars',
-		key: 'TGSTARS',
+		key: 'XTR',
 		symbol: 'STARS',
 		iso4217Num: null,
 	},
