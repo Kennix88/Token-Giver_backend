@@ -233,13 +233,15 @@ model BoostScore {
   discount       Float   @default(1)
   isActive       Boolean @default(true) @map("is_active")
 
-  // paymens
+  payments Payments[]
+
   @@map("boost_score")
 }
 
 model DaysReward {
   day   Int   @id @default(1)
   coins Float @default(0)
+  gems  Float @default(0)
 
   @@map("days_reward")
 }
@@ -280,6 +282,8 @@ model Payments {
   currencyId            String               @map("currency_id")
   premiumSubscription   PremiumSubscription? @relation(fields: [premiumSubscriptionId], references: [id])
   premiumSubscriptionId String?              @map("premium_subscription_id")
+  boostScore            BoostScore?          @relation(fields: [boostScoreId], references: [id])
+  boostScoreId          Int?                 @map("boost_score_id")
 
   @@map("payments")
 }
