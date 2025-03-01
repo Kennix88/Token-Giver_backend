@@ -354,7 +354,7 @@ model Task {
 
   coins              Float        @default(0)
   gems               Float        @default(0)
-  icon               String
+  icon               TaskIconEnum
   type               TaskTypeEnum @default(LINK_TIME)
   data               String
   duractionInSeconds Int?
@@ -377,6 +377,44 @@ model Task {
   progress  TaskProgress[]
 
   @@map("task")
+}
+
+enum TaskIconEnum {
+  OTHER
+  EMOJI
+  ADS
+  BOOST
+  GAME
+  PERCENT
+  FRIEND
+  PREMIUM_FRIEND
+  AGE
+  ROBOT
+  PREMIUM
+  STAR
+  TON
+  WALLET
+  X
+  TELEGRAM
+  YOUTUBE
+  TIKTOK
+  INSTAGRAM
+  FACEBOOK
+  BOOSTY
+  DISCORD
+  VK
+  GITHUB
+  COINMARKETCAP
+  VIBER
+  WHATSAPP
+  WECHAT
+  DZEN
+  OK
+  STEAM
+  TWITCH
+  TROVO
+  APPSTORE
+  GOOGLEPLAY
 }
 
 enum TaskCategoryEnum {
