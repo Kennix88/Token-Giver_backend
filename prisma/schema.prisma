@@ -46,57 +46,37 @@ model CurrencyRates {
   @@map("currency_rates")
 }
 
-model Leaderboards {
-  id        String                   @id @default(uuid())
-  coins     LeaderboardByCoins[]
-  gems      LeaderboardByGems[]
-  referrals LeaderboardByReferrals[]
+model CoinsLeaderboard {
+  id    String @id @default(uuid())
+  rank  Int    @default(1)
+  value Float
 
-  createdAt DateTime @default(now()) @map("created_at")
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique @map("user_id")
 
-  @@map("liderboard")
+  @@map("coins_leaderboard")
 }
 
-model LeaderboardByCoins {
-  id     String @id @default(uuid())
-  score  Int    @default(1)
-  shift  Int    @default(0)
-  amount Float
+model GemsLeaderboard {
+  id    String @id @default(uuid())
+  rank  Int    @default(1)
+  value Float
 
-  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id])
-  leaderboardId String       @unique @map("leaderboard_id")
-  user          User         @relation(fields: [userId], references: [id])
-  userId        String       @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique @map("user_id")
 
-  @@map("liderboard_by_coins")
+  @@map("gems_leaderboard")
 }
 
-model LeaderboardByGems {
-  id     String @id @default(uuid())
-  score  Int    @default(1)
-  shift  Int    @default(0)
-  amount Float
+model ReferralIncomeLeaderboard {
+  id    String @id @default(uuid())
+  rank  Int    @default(1)
+  value Float
 
-  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id])
-  leaderboardId String       @unique @map("leaderboard_id")
-  user          User         @relation(fields: [userId], references: [id])
-  userId        String       @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique @map("user_id")
 
-  @@map("liderboard_by_gems")
-}
-
-model LeaderboardByReferrals {
-  id     String @id @default(uuid())
-  score  Int    @default(1)
-  shift  Int    @default(0)
-  amount Float
-
-  leaderboard   Leaderboards @relation(fields: [leaderboardId], references: [id])
-  leaderboardId String       @unique @map("leaderboard_id")
-  user          User         @relation(fields: [userId], references: [id])
-  userId        String       @unique @map("user_id")
-
-  @@map("liderboard_by_referrals")
+  @@map("referral_income_leaderboard")
 }
 
 model KingTheHill {
@@ -154,21 +134,21 @@ model User {
   banExpiredAt  DateTime? @map("banned_expired_at")
   deletedAt     DateTime? @map("deleted_at")
 
-  payments               Payments[]
-  referrals              User[]                  @relation("UserReferral")
-  inviter                User?                   @relation("UserReferral", fields: [inviterId], references: [id])
-  inviterId              String?                 @map("inviter_id")
-  kingTheHill            KingTheHill?
-  telegramData           UserTelegramData?       @relation(fields: [telegramDataId], references: [id])
-  telegramDataId         String?                 @unique @map("telegram_data_id")
-  premiumSubscription    PremiumSubscription?    @relation(fields: [premiumSubscriptionId], references: [id])
-  premiumSubscriptionId  String?                 @unique @map("premium_subscription_id")
-  language               Language                @relation(fields: [languageId], references: [id])
-  languageId             String                  @map("language_id")
-  leaderboardByCoins     LeaderboardByCoins?
-  leaderboardByGems      LeaderboardByGems?
-  leaderboardByReferrals LeaderboardByReferrals?
-  tasksProgress          TaskProgress[]
+  payments                  Payments[]
+  referrals                 User[]                     @relation("UserReferral")
+  inviter                   User?                      @relation("UserReferral", fields: [inviterId], references: [id])
+  inviterId                 String?                    @map("inviter_id")
+  kingTheHill               KingTheHill?
+  telegramData              UserTelegramData?          @relation(fields: [telegramDataId], references: [id])
+  telegramDataId            String?                    @unique @map("telegram_data_id")
+  premiumSubscription       PremiumSubscription?       @relation(fields: [premiumSubscriptionId], references: [id])
+  premiumSubscriptionId     String?                    @unique @map("premium_subscription_id")
+  language                  Language                   @relation(fields: [languageId], references: [id])
+  languageId                String                     @map("language_id")
+  coinsLeaderboard          CoinsLeaderboard?
+  gemsLeaderboard           GemsLeaderboard?
+  referralIncomeLeaderboard ReferralIncomeLeaderboard?
+  tasksProgress             TaskProgress[]
 
   @@map("users")
 }
