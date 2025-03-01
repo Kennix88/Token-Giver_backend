@@ -1,0 +1,6 @@
+export enum TaskProgressStatusEnum {
+	PENDING = 'PENDING',
+	IN_PROGRESS = 'IN_PROGRESS',
+	COMPLETED = 'COMPLETED',
+	EXPIRED = 'EXPIRED',
+}
