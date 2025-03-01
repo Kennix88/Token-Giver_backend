@@ -117,16 +117,16 @@ model UserTelegramData {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  telegramId String   @unique @map("telegram_id")
-  tonWallet  String   @unique @map("ton_wallet")
-  coins      Float    @default(0)
-  gems       Float    @default(0)
-  isInited   Boolean  @default(false)
-  role       RoleEnum @default(USER)
-  isBanned   Boolean  @default(false)
-  isDeleted  Boolean  @default(false)
-  startDay   Int      @default(1)
+  id         String       @id @default(uuid())
+  telegramId String       @unique @map("telegram_id")
+  tonWallet  String       @unique @map("ton_wallet")
+  coins      Float        @default(0)
+  gems       Float        @default(0)
+  isInited   Boolean      @default(false)
+  role       UserRoleEnum @default(USER)
+  isBanned   Boolean      @default(false)
+  isDeleted  Boolean      @default(false)
+  startDay   Int          @default(1)
 
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
@@ -153,7 +153,7 @@ model User {
   @@map("users")
 }
 
-enum RoleEnum {
+enum UserRoleEnum {
   SUPER_ADMIN
   ADMIN
   USER
@@ -165,14 +165,14 @@ model Reward {
   bonusCoins Float            @default(0)
   gems       Float            @default(0)
   bonusGems  Float            @default(0)
-  reason     ReasonRewardEnum
+  reason     RewardReasonEnum
 
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("reward")
 }
 
-enum ReasonRewardEnum {
+enum RewardReasonEnum {
   REFERRAL
   TASK
   BOOST
