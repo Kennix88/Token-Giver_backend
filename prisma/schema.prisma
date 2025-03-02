@@ -120,16 +120,14 @@ model UserTelegramData {
 }
 
 model User {
-  id         String       @id @default(uuid())
-  telegramId String       @unique @map("telegram_id")
-  tonWallet  String       @unique @map("ton_wallet")
-  coins      Float        @default(0)
-  gems       Float        @default(0)
-  isInited   Boolean      @default(false)
-  role       UserRoleEnum @default(USER)
-  isBanned   Boolean      @default(false)
-  isDeleted  Boolean      @default(false)
-  startDay   Int          @default(1)
+  id               String       @id @default(uuid())
+  telegramId       String       @unique @map("telegram_id")
+  tonWallet        String       @unique @map("ton_wallet")
+  isInited         Boolean      @default(false)
+  role             UserRoleEnum @default(USER)
+  isBanned         Boolean      @default(false)
+  isDeleted        Boolean      @default(false)
+  gameSessionCount Int          @default(1)
 
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
@@ -137,6 +135,7 @@ model User {
   banExpiredAt  DateTime? @map("banned_expired_at")
   deletedAt     DateTime? @map("deleted_at")
 
+  wallets                   UserWallets[]
   payments                  Payments[]
   referrals                 User[]                     @relation("UserReferral")
   inviter                   User?                      @relation("UserReferral", fields: [inviterId], references: [id])
@@ -160,6 +159,27 @@ enum UserRoleEnum {
   SUPER_ADMIN
   ADMIN
   USER
+}
+
+model UserWallets {
+  id          String         @id @default(uuid())
+  type        WalletTypeEnum
+  balance     Float          @default(0)
+  totalEarned Float          @default(0) @map("total_earned")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  @@map("user_wallets")
+}
+
+enum WalletTypeEnum {
+  COINS
+  GEMS
+  USD
 }
 
 model Reward {
