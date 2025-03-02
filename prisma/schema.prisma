@@ -166,12 +166,15 @@ model UserWallets {
   type        WalletTypeEnum
   balance     Float          @default(0)
   totalEarned Float          @default(0) @map("total_earned")
+  holding     Float          @default(0)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @map("user_id")
+
+  walletTransactions WalletTransactions[]
 
   @@map("user_wallets")
 }
@@ -182,23 +185,49 @@ enum WalletTypeEnum {
   USD
 }
 
-model Reward {
-  id         String           @id @default(uuid())
-  coins      Float            @default(0)
-  bonusCoins Float            @default(0)
-  gems       Float            @default(0)
-  bonusGems  Float            @default(0)
-  reason     RewardReasonEnum
+model WalletTransactions {
+  id                String                        @id @default(uuid())
+  type              WalletTransactionTypeEnum
+  status            WalletTransactionsStatusEnum
+  amount            Float
+  isHold            Boolean                       @default(false)
+  reason            WalletTransactionsReasonEnum?
+  withdrawalAddress String?
 
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  holdExpiredAt DateTime? @map("hold_expired_at")
 
-  @@map("reward")
+  userWallets   UserWallets @relation(fields: [userWalletsId], references: [id])
+  userWalletsId String      @map("user_wallets_id")
+
+  @@map("wallet_transactions")
 }
 
-enum RewardReasonEnum {
-  REFERRAL
-  TASK
-  BOOST
+enum WalletTransactionTypeEnum {
+  DEPOSIT
+  WITHDRAWAL
+}
+
+enum WalletTransactionsStatusEnum {
+  PENDING
+  COMPLETED
+}
+
+enum WalletTransactionsReasonEnum {
+  DEPOSIT_REFERRAL_INVITE
+  DEPOSIT_REFERRAL_PERCENT
+  DEPOSIT_DAILY_BONUS
+  DEPOSIT_BONUS
+  DEPOSIT_TASK
+  DEPOSIT_AGE
+  DEPOSIT_REFAUND
+  DEPODIT_KING_THE_HILL
+  DEPOSIT_BOOST_SCORE
+
+  WITHDRAWAL_USD
+  WITHDRAWAL_FINE
+  WITHDRAWAL_GAME
 }
 
 model Language {
