@@ -47,9 +47,10 @@ model CurrencyRates {
 }
 
 model CoinsLeaderboard {
-  id    String @id @default(uuid())
-  rank  Int    @default(1)
-  value Float
+  id            String @id @default(uuid())
+  place         Int    @default(1)
+  previousPlace Int    @default(1)
+  score         Float
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique @map("user_id")
@@ -58,9 +59,10 @@ model CoinsLeaderboard {
 }
 
 model GemsLeaderboard {
-  id    String @id @default(uuid())
-  rank  Int    @default(1)
-  value Float
+  id            String @id @default(uuid())
+  place         Int    @default(1)
+  previousPlace Int    @default(1)
+  score         Float
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique @map("user_id")
@@ -69,9 +71,10 @@ model GemsLeaderboard {
 }
 
 model ReferralIncomeLeaderboard {
-  id    String @id @default(uuid())
-  rank  Int    @default(1)
-  value Float
+  id            String @id @default(uuid())
+  place         Int    @default(1)
+  previousPlace Int    @default(1)
+  score         Float
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique @map("user_id")
