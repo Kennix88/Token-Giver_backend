@@ -182,6 +182,8 @@ model UserWallets {
 enum WalletTypeEnum {
   COINS
   GEMS
+  TICKETS
+  AP
   USD
 }
 
@@ -378,14 +380,11 @@ model TaskDecriptions {
 }
 
 model Task {
-  id             String            @id @default(uuid())
-  titleKey       String?
-  titles         TaskTitles[]
-  descriptionKey String?
-  descriptions   TaskDecriptions[]
+  id           String            @id @default(uuid())
+  titles       TaskTitles[]
+  descriptions TaskDecriptions[]
 
-  coins              Float        @default(0)
-  gems               Float        @default(0)
+  prizes             TaskPrizes[]
   icon               TaskIconEnum
   type               TaskTypeEnum @default(LINK_TIME)
   data               String
@@ -409,6 +408,17 @@ model Task {
   progress  TaskProgress[]
 
   @@map("task")
+}
+
+model TaskPrizes {
+  id         String         @id @default(uuid())
+  walletType WalletTypeEnum
+  amount     Int
+
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String @map("task_id")
+
+  @@map("task_prizes")
 }
 
 enum TaskIconEnum {
