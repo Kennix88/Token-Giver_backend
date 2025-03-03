@@ -8,9 +8,13 @@ datasource db {
   url      = env("POSTGRES_URI")
 }
 
+enum DefaultEnum {
+  DEFAULT
+}
+
 model Settings {
-  key          String  @id @default("default")
-  gameIsActive Boolean @default(false) @map("game_is_active")
+  key          DefaultEnum @id @default(DEFAULT)
+  gameIsActive Boolean     @default(false) @map("game_is_active")
 
   gameName            String  @default("Token Giver") @map("game_name")
   gameLogoUrl         String? @map("game_logo")
@@ -36,9 +40,9 @@ model Settings {
 }
 
 model CurrencyRates {
-  key           String @id @default("default")
-  rates         Json?  @db.JsonB
-  coinmarketcap Json?  @db.JsonB
+  key           DefaultEnum @id @default(DEFAULT)
+  rates         Json?       @db.JsonB
+  coinmarketcap Json?       @db.JsonB
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -90,7 +94,7 @@ model MainLeaderboard {
   @@map("main_leaderboard")
 }
 
-model CoinsLeaderboard {
+model APLeaderboard {
   id            String @id @default(uuid())
   place         Int    @default(1)
   previousPlace Int    @default(1)
@@ -99,22 +103,31 @@ model CoinsLeaderboard {
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique @map("user_id")
 
-  @@map("coins_leaderboard")
+  @@map("ap_leaderboard")
 }
 
-model GemsLeaderboard {
-  id            String @id @default(uuid())
-  place         Int    @default(1)
-  previousPlace Int    @default(1)
-  score         Float
+model Prizes {
+  id     String         @id @default(uuid())
+  type   WalletTypeEnum
+  amount Float
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique @map("user_id")
+  apLeaderboardPrizes   APLeaderboardPrizes? @relation(fields: [apLeaderboardPrizesId], references: [id])
+  apLeaderboardPrizesId String?              @unique @map("ap_leaderboard_prizes_id")
 
-  @@map("gems_leaderboard")
+  @@map("prizes")
 }
 
-model ReferralIncomeLeaderboard {
+model APLeaderboardPrizes {
+  id         String @id @default(uuid())
+  startPlace Int    @default(1)
+  endPlace   Int    @default(10)
+
+  prizes Prizes[]
+
+  @@map("ap_leaderboard_prizes")
+}
+
+model ReferralLeaderboard {
   id            String @id @default(uuid())
   place         Int    @default(1)
   previousPlace Int    @default(1)
@@ -123,17 +136,17 @@ model ReferralIncomeLeaderboard {
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique @map("user_id")
 
-  @@map("referral_income_leaderboard")
+  @@map("referral_leaderboard")
 }
 
 model KingTheHill {
-  key                 String    @id @default("default")
-  priceInTgStars      Int       @default(100) @map("price_in_tg_stars")
-  discount            Float     @default(1)
-  maxDays             Int       @default(30) @map("max_days")
-  rewardCoinsInMinute Float     @default(1) @map("reward_coins_in_minute")
-  isKing              Boolean   @default(false) @map("is_king")
-  startedAt           DateTime? @map("started_at")
+  key                 DefaultEnum @id @default(DEFAULT)
+  priceInTgStars      Int         @default(100) @map("price_in_tg_stars")
+  discount            Float       @default(1)
+  maxDays             Int         @default(30) @map("max_days")
+  rewardCoinsInMinute Float       @default(1) @map("reward_coins_in_minute")
+  isKing              Boolean     @default(false) @map("is_king")
+  startedAt           DateTime?   @map("started_at")
 
   user   User?   @relation(fields: [userId], references: [id])
   userId String? @unique @map("user_id")
@@ -180,24 +193,23 @@ model User {
   banExpiredAt  DateTime? @map("banned_expired_at")
   deletedAt     DateTime? @map("deleted_at")
 
-  wallets                   UserWallets[]
-  socialLinks               SocialLinks[]
-  payments                  Payments[]
-  referrals                 User[]                     @relation("UserReferral")
-  inviter                   User?                      @relation("UserReferral", fields: [inviterId], references: [id])
-  inviterId                 String?                    @map("inviter_id")
-  kingTheHill               KingTheHill?
-  telegramData              UserTelegramData?          @relation(fields: [telegramDataId], references: [id])
-  telegramDataId            String?                    @unique @map("telegram_data_id")
-  premiumSubscription       PremiumSubscription?       @relation(fields: [premiumSubscriptionId], references: [id])
-  premiumSubscriptionId     String?                    @unique @map("premium_subscription_id")
-  language                  Language                   @relation(fields: [languageId], references: [id])
-  languageId                String                     @map("language_id")
-  coinsLeaderboard          CoinsLeaderboard?
-  gemsLeaderboard           GemsLeaderboard?
-  mainLeaderboard           MainLeaderboard?
-  referralIncomeLeaderboard ReferralIncomeLeaderboard?
-  tasksProgress             TaskProgress[]
+  wallets               UserWallets[]
+  socialLinks           SocialLinks[]
+  payments              Payments[]
+  referrals             User[]               @relation("UserReferral")
+  inviter               User?                @relation("UserReferral", fields: [inviterId], references: [id])
+  inviterId             String?              @map("inviter_id")
+  kingTheHill           KingTheHill?
+  telegramData          UserTelegramData?    @relation(fields: [telegramDataId], references: [id])
+  telegramDataId        String?              @unique @map("telegram_data_id")
+  premiumSubscription   PremiumSubscription? @relation(fields: [premiumSubscriptionId], references: [id])
+  premiumSubscriptionId String?              @unique @map("premium_subscription_id")
+  language              Language             @relation(fields: [languageId], references: [id])
+  languageId            String               @map("language_id")
+  apLeaderboard         APLeaderboard?
+  mainLeaderboard       MainLeaderboard?
+  referralLeaderboard   ReferralLeaderboard?
+  tasksProgress         TaskProgress[]
 
   @@map("users")
 }
@@ -256,7 +268,9 @@ enum WalletTypeEnum {
   GEMS
   TICKETS
   AP
-  USD
+  STARS
+  TON
+  USDT
 }
 
 model WalletTransactions {
