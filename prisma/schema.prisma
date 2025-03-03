@@ -119,12 +119,28 @@ model Prizes {
   @@map("prizes")
 }
 
+model APLeaderboardSeason {
+  id String @id @default(uuid())
+
+  startedAt DateTime
+  endedAt   DateTime
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  results Json?                 @db.JsonB
+  prizes  APLeaderboardPrizes[]
+
+  @@map("ap_leaderboard_season")
+}
+
 model APLeaderboardPrizes {
   id         String @id @default(uuid())
   startPlace Int    @default(1)
   endPlace   Int    @default(10)
 
-  prizes Prizes[]
+  prizes                Prizes[]
+  apLeaderboardSeason   APLeaderboardSeason @relation(fields: [apLeaderboardSeasonId], references: [id])
+  apLeaderboardSeasonId String              @unique @map("ap_leaderboard_season_id")
 
   @@map("ap_leaderboard_prizes")
 }
