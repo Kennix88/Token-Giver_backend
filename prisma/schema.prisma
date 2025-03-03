@@ -94,18 +94,6 @@ model MainLeaderboard {
   @@map("main_leaderboard")
 }
 
-model APLeaderboard {
-  id            String @id @default(uuid())
-  place         Int    @default(1)
-  previousPlace Int    @default(1)
-  score         Float
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique @map("user_id")
-
-  @@map("ap_leaderboard")
-}
-
 model Prizes {
   id     String         @id @default(uuid())
   type   WalletTypeEnum
@@ -117,6 +105,19 @@ model Prizes {
   referralLeaderboardPrizesId String?                    @unique @map("referral_leaderboard_prizes_id")
 
   @@map("prizes")
+}
+
+model APLeaderboard {
+  id            String  @id @default(uuid())
+  place         Int     @default(1)
+  previousPlace Int     @default(1)
+  score         Float
+  isRewarded    Boolean @default(false)
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique @map("user_id")
+
+  @@map("ap_leaderboard")
 }
 
 model APLeaderboardSeason {
@@ -145,21 +146,38 @@ model APLeaderboardPrizes {
   @@map("ap_leaderboard_prizes")
 }
 
+model ReferralLeaderboardSeason {
+  id String @id @default(uuid())
+
+  startedAt DateTime
+  endedAt   DateTime
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  results Json?                       @db.JsonB
+  prizes  ReferralLeaderboardPrizes[]
+
+  @@map("referral_leaderboard_season")
+}
+
 model ReferralLeaderboardPrizes {
   id         String @id @default(uuid())
   startPlace Int    @default(1)
   endPlace   Int    @default(10)
 
-  prizes Prizes[]
+  prizes                      Prizes[]
+  referralLeaderboardSeason   ReferralLeaderboardSeason @relation(fields: [referralLeaderboardSeasonId], references: [id])
+  referralLeaderboardSeasonId String                    @unique @map("referral_leaderboard_season_id")
 
   @@map("referral_leaderboard_prizes")
 }
 
 model ReferralLeaderboard {
-  id            String @id @default(uuid())
-  place         Int    @default(1)
-  previousPlace Int    @default(1)
+  id            String  @id @default(uuid())
+  place         Int     @default(1)
+  previousPlace Int     @default(1)
   score         Float
+  isRewarded    Boolean @default(false)
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique @map("user_id")
