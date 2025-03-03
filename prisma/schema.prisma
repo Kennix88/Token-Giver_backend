@@ -111,8 +111,10 @@ model Prizes {
   type   WalletTypeEnum
   amount Float
 
-  apLeaderboardPrizes   APLeaderboardPrizes? @relation(fields: [apLeaderboardPrizesId], references: [id])
-  apLeaderboardPrizesId String?              @unique @map("ap_leaderboard_prizes_id")
+  apLeaderboardPrizes         APLeaderboardPrizes?       @relation(fields: [apLeaderboardPrizesId], references: [id])
+  apLeaderboardPrizesId       String?                    @unique @map("ap_leaderboard_prizes_id")
+  referralLeaderboardPrizes   ReferralLeaderboardPrizes? @relation(fields: [referralLeaderboardPrizesId], references: [id])
+  referralLeaderboardPrizesId String?                    @unique @map("referral_leaderboard_prizes_id")
 
   @@map("prizes")
 }
@@ -125,6 +127,16 @@ model APLeaderboardPrizes {
   prizes Prizes[]
 
   @@map("ap_leaderboard_prizes")
+}
+
+model ReferralLeaderboardPrizes {
+  id         String @id @default(uuid())
+  startPlace Int    @default(1)
+  endPlace   Int    @default(10)
+
+  prizes Prizes[]
+
+  @@map("referral_leaderboard_prizes")
 }
 
 model ReferralLeaderboard {
