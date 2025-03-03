@@ -222,6 +222,18 @@ model UserTelegramData {
   @@map("user_telegram_data")
 }
 
+model Referral {
+  id         String  @id @default(uuid())
+  isMain     Boolean @default(true)
+  inviter    User    @relation("inviter", fields: [inviterId], references: [id])
+  inviterId  String  @map("inviter_id")
+  referral   User    @relation("referral", fields: [referralId], references: [id])
+  referralId String  @map("referral_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
 model User {
   id               String       @id @default(uuid())
   description      String?      @db.VarChar(100)
@@ -242,9 +254,8 @@ model User {
   wallets               UserWallets[]
   socialLinks           SocialLinks[]
   payments              Payments[]
-  referrals             User[]               @relation("UserReferral")
-  inviter               User?                @relation("UserReferral", fields: [inviterId], references: [id])
-  inviterId             String?              @map("inviter_id")
+  referrals             Referral[]           @relation("referral")
+  inviters              Referral[]           @relation("inviter")
   kingTheHill           KingTheHill?
   telegramData          UserTelegramData?    @relation(fields: [telegramDataId], references: [id])
   telegramDataId        String?              @unique @map("telegram_data_id")
