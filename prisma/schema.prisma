@@ -46,6 +46,50 @@ model CurrencyRates {
   @@map("currency_rates")
 }
 
+model League {
+  type     LeagueTypeEnum @id
+  minValue Int
+  maxValue Int
+
+  mainLeaderboard MainLeaderboard[]
+
+  @@map("leagues")
+}
+
+enum LeagueTypeEnum {
+  WOOD
+  STONE
+  IRON
+  BRONZE
+  SILVER
+  GOLD
+  TITANIUM
+  DIAMOND
+  NEPHRITE
+  ORICHALCUM
+  MITHRIL
+  ADAMANTIUM
+  DRAGONSTEEL
+  STARSTEEL
+}
+
+model MainLeaderboard {
+  id            String @id @default(uuid())
+  place         Int    @default(1)
+  previousPlace Int    @default(1)
+  score         Float
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  league     League         @relation(fields: [leagueType], references: [type])
+  leagueType LeagueTypeEnum
+  user       User           @relation(fields: [userId], references: [id])
+  userId     String         @unique @map("user_id")
+
+  @@map("main_leaderboard")
+}
+
 model CoinsLeaderboard {
   id            String @id @default(uuid())
   place         Int    @default(1)
@@ -151,6 +195,7 @@ model User {
   languageId                String                     @map("language_id")
   coinsLeaderboard          CoinsLeaderboard?
   gemsLeaderboard           GemsLeaderboard?
+  mainLeaderboard           MainLeaderboard?
   referralIncomeLeaderboard ReferralIncomeLeaderboard?
   tasksProgress             TaskProgress[]
 
