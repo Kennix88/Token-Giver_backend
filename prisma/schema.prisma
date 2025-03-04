@@ -40,11 +40,10 @@ model ReferralSettings {
   newPremiumPrizes Prizes[]    @relation("newPremiumPrizes")
   newLvlUpPrizes   Prizes[]    @relation("newLvlUpPrizes")
 
-  taskPercent Float @default(0.05) @map("task_percent")
-  gamePercent Float @default(0.01) @map("game_percent")
+  taskPercent    Float @default(0.05) @map("task_percent")
+  gamePercent    Float @default(0.01) @map("game_percent")
+  paymentPercent Float @default(0.10) @map("payment_percent")
 
-  // In AppLedger (invitePercent)
-  // paymentPercent Float @default(0.10) @map("payment_percent")
   @@map("referral_settings")
 }
 
@@ -64,9 +63,31 @@ model AppLedger {
   profitPercent     Float       @default(0.3) @map("profit_percent")
   airdropPercent    Float       @default(0.5) @map("airdrop_percent")
   commissionPercent Float       @default(0.1) @map("commission_percent")
-  invitePercent     Float       @default(0.1) @map("invite_percent")
+
+  wallets AppWallet[]
 
   @@map("app_ledger")
+}
+
+model AppWallet {
+  category AppWalletCategoryEnum @id
+  type     AppWalletTypeEnum
+  amount   Float                 @default(0)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  appLedger   AppLedger   @relation(fields: [appLedgerId], references: [key])
+  appLedgerId DefaultEnum @map("app_ledger_id")
+
+  @@map("app_wallet")
+}
+
+enum AppWalletCategoryEnum {
+  PROFIT
+  AIRDROP
+  COMMISSION
+  REFERRAL
 }
 
 enum AppWalletTypeEnum {
