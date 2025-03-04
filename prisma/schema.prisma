@@ -85,10 +85,27 @@ enum LeagueTypeEnum {
   STARSTEEL
 }
 
+model AirdropLeaderboard {
+  id            String @id @default(uuid())
+  place         Int    @default(1)
+  previousPlace Int    @default(1) @map("previous_place")
+  score         Float
+  // airdrop      AirdropPrizes[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("airdrop_leaderboard")
+}
+
+// model AirdropPrizes {
+//   id String @id
+// }
+
 model MainLeaderboard {
   id            String @id @default(uuid())
   place         Int    @default(1)
-  previousPlace Int    @default(1)
+  previousPlace Int    @default(1) @map("previous_place")
   score         Float
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -129,9 +146,12 @@ model Prizes {
 model APLeaderboard {
   id            String  @id @default(uuid())
   place         Int     @default(1)
-  previousPlace Int     @default(1)
+  previousPlace Int     @default(1) @map("previous_place")
   score         Float
-  isRewarded    Boolean @default(false)
+  isRewarded    Boolean @default(false) @map("is_rewarded")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique @map("user_id")
@@ -155,8 +175,8 @@ model APLeaderboardSeason {
 
 model APLeaderboardPrizes {
   id         String @id @default(uuid())
-  startPlace Int    @default(1)
-  endPlace   Int    @default(10)
+  startPlace Int    @default(1) @map("start_place")
+  endPlace   Int    @default(10) @map("end_place")
 
   prizes                Prizes[]
   apLeaderboardSeason   APLeaderboardSeason @relation(fields: [apLeaderboardSeasonId], references: [id])
@@ -168,8 +188,8 @@ model APLeaderboardPrizes {
 model ReferralLeaderboardSeason {
   id String @id @default(uuid())
 
-  startedAt DateTime
-  endedAt   DateTime
+  startedAt DateTime @map("started_at")
+  endedAt   DateTime @map("ended_at")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -181,8 +201,8 @@ model ReferralLeaderboardSeason {
 
 model ReferralLeaderboardPrizes {
   id         String @id @default(uuid())
-  startPlace Int    @default(1)
-  endPlace   Int    @default(10)
+  startPlace Int    @default(1) @map("start_place")
+  endPlace   Int    @default(10) @map("end_place")
 
   prizes                      Prizes[]
   referralLeaderboardSeason   ReferralLeaderboardSeason @relation(fields: [referralLeaderboardSeasonId], references: [id])
@@ -194,9 +214,12 @@ model ReferralLeaderboardPrizes {
 model ReferralLeaderboard {
   id            String  @id @default(uuid())
   place         Int     @default(1)
-  previousPlace Int     @default(1)
+  previousPlace Int     @default(1) @map("previous_place")
   score         Float
-  isRewarded    Boolean @default(false)
+  isRewarded    Boolean @default(false) @map("is_rewarded")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique @map("user_id")
