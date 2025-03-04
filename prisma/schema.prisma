@@ -64,12 +64,12 @@ model AppLedger {
   airdropPercent    Float       @default(0.5) @map("airdrop_percent")
   commissionPercent Float       @default(0.1) @map("commission_percent")
 
-  wallets AppWallet[]
+  wallets AppWallets[]
 
   @@map("app_ledger")
 }
 
-model AppWallet {
+model AppWallets {
   category AppWalletCategoryEnum @id
   type     AppWalletTypeEnum
   amount   Float                 @default(0)
@@ -77,8 +77,9 @@ model AppWallet {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  appLedger   AppLedger   @relation(fields: [appLedgerId], references: [key])
-  appLedgerId DefaultEnum @map("app_ledger_id")
+  appWalletTransactions AppWalletTransactions[]
+  appLedger             AppLedger               @relation(fields: [appLedgerId], references: [key])
+  appLedgerId           DefaultEnum             @map("app_ledger_id")
 
   @@map("app_wallet")
 }
@@ -94,6 +95,20 @@ enum AppWalletTypeEnum {
   STARS
   TON
   USDT
+}
+
+model AppWalletTransactions {
+  id     String                    @id @default(uuid())
+  type   WalletTransactionTypeEnum
+  amount Float
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  appWallets   AppWallets            @relation(fields: [appWalletsId], references: [category])
+  appWalletsId AppWalletCategoryEnum @map("app_wallets_id")
+
+  @@map("app_wallet_transactions")
 }
 
 model AirdropLeaderboard {
@@ -440,8 +455,8 @@ model WalletTransactions {
 }
 
 enum WalletTransactionTypeEnum {
-  DEPOSIT
-  WITHDRAWAL
+  PLUS
+  MINUS
 }
 
 enum WalletTransactionsStatusEnum {
@@ -450,19 +465,19 @@ enum WalletTransactionsStatusEnum {
 }
 
 enum WalletTransactionsReasonEnum {
-  DEPOSIT_REFERRAL_INVITE
-  DEPOSIT_REFERRAL_PERCENT
-  DEPOSIT_DAILY_BONUS
-  DEPOSIT_BONUS
-  DEPOSIT_TASK
-  DEPOSIT_AGE
-  DEPOSIT_REFAUND
-  DEPODIT_KING_THE_HILL
-  DEPOSIT_BOOST_SCORE
+  P_REFERRAL_INVITE
+  P_REFERRAL_PERCENT
+  P_DAILY_BONUS
+  P_BONUS
+  P_TASK
+  P_AGE
+  P_REFAUND
+  P_KING_THE_HILL
+  P_BOOST_SCORE
 
-  WITHDRAWAL_USD
-  WITHDRAWAL_FINE
-  WITHDRAWAL_GAME
+  M_USD
+  M_FINE
+  M_GAME
 }
 
 model Language {
