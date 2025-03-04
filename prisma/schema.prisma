@@ -85,12 +85,18 @@ enum LeagueTypeEnum {
   STARSTEEL
 }
 
+enum AppWalletTypeEnum {
+  STARS
+  TON
+  USDT
+}
+
 model AirdropLeaderboard {
-  id            String @id @default(uuid())
-  place         Int    @default(1)
-  previousPlace Int    @default(1) @map("previous_place")
+  id            String          @id @default(uuid())
+  place         Int             @default(1)
+  previousPlace Int             @default(1) @map("previous_place")
   score         Float
-  // airdrop      AirdropPrizes[]
+  airdrop       AirdropPrizes[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -98,9 +104,19 @@ model AirdropLeaderboard {
   @@map("airdrop_leaderboard")
 }
 
-// model AirdropPrizes {
-//   id String @id
-// }
+model AirdropPrizes {
+  id     String            @id @default(uuid())
+  type   AppWalletTypeEnum
+  amount Float
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  airdropLeaderboard   AirdropLeaderboard @relation(fields: [airdropLeaderboardId], references: [id])
+  airdropLeaderboardId String             @unique @map("airdrop_leaderboard_id")
+
+  @@map("airdrop_prizes")
+}
 
 model MainLeaderboard {
   id            String @id @default(uuid())
