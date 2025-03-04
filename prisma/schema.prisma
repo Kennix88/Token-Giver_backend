@@ -40,10 +40,11 @@ model ReferralSettings {
   newPremiumPrizes Prizes[]    @relation("newPremiumPrizes")
   newLvlUpPrizes   Prizes[]    @relation("newLvlUpPrizes")
 
-  taskPercent    Float @default(0.05) @map("task_percent")
-  gamePercent    Float @default(0.01) @map("game_percent")
-  paymentPercent Float @default(0.10) @map("payment_percent")
+  taskPercent Float @default(0.05) @map("task_percent")
+  gamePercent Float @default(0.01) @map("game_percent")
 
+  // In AppLedger (invitePercent)
+  // paymentPercent Float @default(0.10) @map("payment_percent")
   @@map("referral_settings")
 }
 
@@ -58,31 +59,14 @@ model CurrencyRates {
   @@map("currency_rates")
 }
 
-model League {
-  type     LeagueTypeEnum @id
-  minValue Int
-  maxValue Int
+model AppLedger {
+  key               DefaultEnum @id @default(DEFAULT)
+  profitPercent     Float       @default(0.3) @map("profit_percent")
+  airdropPercent    Float       @default(0.5) @map("airdrop_percent")
+  commissionPercent Float       @default(0.1) @map("commission_percent")
+  invitePercent     Float       @default(0.1) @map("invite_percent")
 
-  mainLeaderboard MainLeaderboard[]
-
-  @@map("leagues")
-}
-
-enum LeagueTypeEnum {
-  WOOD
-  STONE
-  IRON
-  BRONZE
-  SILVER
-  GOLD
-  TITANIUM
-  DIAMOND
-  NEPHRITE
-  ORICHALCUM
-  MITHRIL
-  ADAMANTIUM
-  DRAGONSTEEL
-  STARSTEEL
+  @@map("app_ledger")
 }
 
 enum AppWalletTypeEnum {
@@ -116,6 +100,33 @@ model AirdropPrizes {
   airdropLeaderboardId String             @unique @map("airdrop_leaderboard_id")
 
   @@map("airdrop_prizes")
+}
+
+model League {
+  type     LeagueTypeEnum @id
+  minValue Int
+  maxValue Int
+
+  mainLeaderboard MainLeaderboard[]
+
+  @@map("leagues")
+}
+
+enum LeagueTypeEnum {
+  WOOD
+  STONE
+  IRON
+  BRONZE
+  SILVER
+  GOLD
+  TITANIUM
+  DIAMOND
+  NEPHRITE
+  ORICHALCUM
+  MITHRIL
+  ADAMANTIUM
+  DRAGONSTEEL
+  STARSTEEL
 }
 
 model MainLeaderboard {
