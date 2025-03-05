@@ -356,22 +356,22 @@ model User {
   banExpiredAt  DateTime? @map("banned_expired_at")
   deletedAt     DateTime? @map("deleted_at")
 
-  wallets               UserWallets[]
-  socialLinks           SocialLinks[]
-  payments              Payments[]
-  referrals             Referral[]           @relation("referral")
-  inviters              Referral[]           @relation("inviter")
-  kingTheHill           KingTheHill?
-  telegramData          UserTelegramData?    @relation(fields: [telegramDataId], references: [id])
-  telegramDataId        String?              @unique @map("telegram_data_id")
-  premiumSubscription   PremiumSubscription? @relation(fields: [premiumSubscriptionId], references: [id])
-  premiumSubscriptionId String?              @unique @map("premium_subscription_id")
-  language              Language             @relation(fields: [languageId], references: [id])
-  languageId            String               @map("language_id")
-  apLeaderboard         APLeaderboard?
-  mainLeaderboard       MainLeaderboard?
-  referralLeaderboard   ReferralLeaderboard?
-  tasksProgress         TaskProgress[]
+  wallets             UserWallets[]
+  socialLinks         SocialLinks[]
+  payments            Payments[]
+  referrals           Referral[]           @relation("referral")
+  inviters            Referral[]           @relation("inviter")
+  kingTheHill         KingTheHill?
+  telegramData        UserTelegramData?    @relation(fields: [telegramDataId], references: [id])
+  telegramDataId      String?              @unique @map("telegram_data_id")
+  vipSubscription     VIPSubscription?     @relation(fields: [vipSubscriptionId], references: [id])
+  vipSubscriptionId   String?              @unique @map("vip_subscription_id")
+  language            Language             @relation(fields: [languageId], references: [id])
+  languageId          String               @map("language_id")
+  apLeaderboard       APLeaderboard?
+  mainLeaderboard     MainLeaderboard?
+  referralLeaderboard ReferralLeaderboard?
+  tasksProgress       TaskProgress[]
 
   @@map("users")
 }
@@ -528,9 +528,17 @@ model DaysReward {
   @@map("days_reward")
 }
 
-model PremiumSubscription {
-  id       String  @id @default(uuid())
-  isActive Boolean @default(false)
+model VIPSubscriptionSettings {
+  type           VIPSubscriptionTypeEnum @id
+  priceInTgStars Float                   @default(100) @map("price_in_tg_stars")
+
+  @@map("vip_subscription_settings")
+}
+
+model VIPSubscription {
+  id       String                  @id @default(uuid())
+  isActive Boolean                 @default(false)
+  type     VIPSubscriptionTypeEnum
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -539,7 +547,13 @@ model PremiumSubscription {
   user     User?
   payments Payments[]
 
-  @@map("premium_subscription")
+  @@map("vip_subscription")
+}
+
+enum VIPSubscriptionTypeEnum {
+  PLUS
+  PRO
+  PREMIUM
 }
 
 model Payments {
@@ -558,14 +572,14 @@ model Payments {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user                  User                 @relation(fields: [userId], references: [id])
-  userId                String               @map("user_id")
-  currency              Currency             @relation(fields: [currencyId], references: [id])
-  currencyId            String               @map("currency_id")
-  premiumSubscription   PremiumSubscription? @relation(fields: [premiumSubscriptionId], references: [id])
-  premiumSubscriptionId String?              @map("premium_subscription_id")
-  boostScore            BoostScore?          @relation(fields: [boostScoreId], references: [id])
-  boostScoreId          Int?                 @map("boost_score_id")
+  user              User             @relation(fields: [userId], references: [id])
+  userId            String           @map("user_id")
+  currency          Currency         @relation(fields: [currencyId], references: [id])
+  currencyId        String           @map("currency_id")
+  vipSubscription   VIPSubscription? @relation(fields: [vipSubscriptionId], references: [id])
+  vipSubscriptionId String?          @map("vip_subscription_id")
+  boostScore        BoostScore?      @relation(fields: [boostScoreId], references: [id])
+  boostScoreId      Int?             @map("boost_score_id")
 
   @@map("payments")
 }
