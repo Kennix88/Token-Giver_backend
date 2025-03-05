@@ -203,8 +203,12 @@ model Prizes {
   referralNewLvlUpPrizes     ReferralSettings? @relation("newLvlUpPrizes", fields: [referralNewLvlUpPrizesId], references: [key])
   referralNewLvlUpPrizesId   DefaultEnum?      @map("referral_new_lvl_up_prizes_id")
 
-  daysReward   DaysReward? @relation(fields: [daysRewardId], references: [day])
-  daysRewardId Int?        @map("days_reward_id")
+  daysReward                DaysReward?              @relation(fields: [daysRewardId], references: [day])
+  daysRewardId              Int?                     @map("days_reward_id")
+  vipSubscriptionSettings   VIPSubscriptionSettings? @relation(fields: [vipSubscriptionSettingsId], references: [type])
+  vipSubscriptionSettingsId VIPSubscriptionTypeEnum? @map("vip_subscription_settings_id")
+  shop                      Shop?                    @relation(fields: [shopId], references: [id])
+  shopId                    String?                  @map("shop_id")
 
   @@map("prizes")
 }
@@ -510,19 +514,6 @@ model Currency {
   @@map("currency")
 }
 
-model BoostScore {
-  id             Int     @id @default(autoincrement())
-  priceInTgStars Int     @map("price_in_tg_stars")
-  coins          Float
-  bonus          Float   @default(1)
-  discount       Float   @default(1)
-  isActive       Boolean @default(true) @map("is_active")
-
-  payments Payments[]
-
-  @@map("boost_score")
-}
-
 model DaysReward {
   day    Int      @id @default(1)
   prizes Prizes[]
@@ -530,9 +521,31 @@ model DaysReward {
   @@map("days_reward")
 }
 
+model Shop {
+  id                 String     @id @default(uuid())
+  category           String
+  isActive           Boolean    @default(true)
+  priceInTgStars     Float      @default(950) @map("price_in_tg_stars")
+  lastPriceInTgStars Float      @default(0) @map("last_price_in_tg_stars")
+  prizes             Prizes[]
+  payments           Payments[]
+
+  @@map("shop")
+}
+
+enum ShopCategoryEnum {
+  LOOTBOXES
+  PACKS
+  GEMS
+  COINS
+  TIKETS
+}
+
 model VIPSubscriptionSettings {
-  type           VIPSubscriptionTypeEnum @id
-  priceInTgStars Float                   @default(100) @map("price_in_tg_stars")
+  type               VIPSubscriptionTypeEnum @id
+  priceInTgStars     Float                   @default(950) @map("price_in_tg_stars")
+  lastPriceInTgStars Float                   @default(1500) @map("last_price_in_tg_stars")
+  prizes             Prizes[]
 
   @@map("vip_subscription_settings")
 }
@@ -580,8 +593,8 @@ model Payments {
   currencyId        String           @map("currency_id")
   vipSubscription   VIPSubscription? @relation(fields: [vipSubscriptionId], references: [id])
   vipSubscriptionId String?          @map("vip_subscription_id")
-  boostScore        BoostScore?      @relation(fields: [boostScoreId], references: [id])
-  boostScoreId      Int?             @map("boost_score_id")
+  shop              Shop?            @relation(fields: [shopId], references: [id])
+  shopId            String?          @map("shop_id")
 
   @@map("payments")
 }
