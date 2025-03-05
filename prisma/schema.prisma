@@ -203,6 +203,9 @@ model Prizes {
   referralNewLvlUpPrizes     ReferralSettings? @relation("newLvlUpPrizes", fields: [referralNewLvlUpPrizesId], references: [key])
   referralNewLvlUpPrizesId   DefaultEnum?      @map("referral_new_lvl_up_prizes_id")
 
+  daysReward   DaysReward? @relation(fields: [daysRewardId], references: [day])
+  daysRewardId Int?        @map("days_reward_id")
+
   @@map("prizes")
 }
 
@@ -521,9 +524,8 @@ model BoostScore {
 }
 
 model DaysReward {
-  day   Int   @id @default(1)
-  coins Float @default(0)
-  gems  Float @default(0)
+  day    Int      @id @default(1)
+  prizes Prizes[]
 
   @@map("days_reward")
 }
