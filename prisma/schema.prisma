@@ -297,19 +297,50 @@ model ReferralLeaderboard {
   @@map("referral_leaderboard")
 }
 
-model KingTheHill {
-  key                 DefaultEnum @id @default(DEFAULT)
-  priceInTgStars      Int         @default(100) @map("price_in_tg_stars")
-  discount            Float       @default(1)
-  maxDays             Int         @default(30) @map("max_days")
-  rewardCoinsInMinute Float       @default(1) @map("reward_coins_in_minute")
-  isKing              Boolean     @default(false) @map("is_king")
-  startedAt           DateTime?   @map("started_at")
+model KingTheHillSettings {
+  key                DefaultEnum @id @default(DEFAULT)
+  duractionInMinutes Int         @default(60) @map("duraction_in_minutes")
 
-  user   User?   @relation(fields: [userId], references: [id])
-  userId String? @unique @map("user_id")
+  @@map("king_the_hill_settings")
+}
+
+model KingTheHill {
+  id         String                    @id @default(uuid())
+  walletType KingTheHillWalletTypeEnum @map("wallet_type")
+  isActive   Boolean                   @default(true) @map("is_active")
+  bank       Float                     @default(0)
+
+  endedAt   DateTime @map("ended_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  transactions KingTheHillTransactions[]
+  user         User                      @relation(fields: [userId], references: [id])
+  userId       String                    @unique @map("user_id")
 
   @@map("king_the_hill")
+}
+
+model KingTheHillTransactions {
+  id         String                    @id @default(uuid())
+  amount     Float
+  walletType KingTheHillWalletTypeEnum @map("wallet_type")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  kingTheHill   KingTheHill @relation(fields: [kingTheHillId], references: [id])
+  kingTheHillId String      @unique @map("king_the_hill_id")
+
+  @@map("king_the_hill_transactions")
+}
+
+enum KingTheHillWalletTypeEnum {
+  COINS
+  GEMS
+  STARS
+  TON
+  USDT
 }
 
 model UserTelegramData {
