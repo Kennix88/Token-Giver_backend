@@ -54,15 +54,16 @@ model ReferralSettings {
   @@map("referral_settings")
 }
 
-model AppLedger {
-  key               DefaultEnum @id @default(DEFAULT)
-  profitPercent     Float       @default(0.3) @map("profit_percent")
-  airdropPercent    Float       @default(0.5) @map("airdrop_percent")
-  commissionPercent Float       @default(0.1) @map("commission_percent")
+model AppLedgerSettings {
+  key            DefaultEnum @id @default(DEFAULT)
+  profitPercent  Float       @default(0.3) @map("profit_percent")
+  airdropPercent Float       @default(0.3) @map("airdrop_percent")
+  courcePercent  Float       @default(0.2) @map("cource_percent")
+  prizesPrecent  Float       @default(0.2) @map("prizes_precent")
 
   wallets AppWallets[]
 
-  @@map("app_ledger")
+  @@map("app_ledger_settings")
 }
 
 model AppWallets {
@@ -74,7 +75,7 @@ model AppWallets {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   appWalletTransactions AppWalletTransactions[]
-  appLedger             AppLedger               @relation(fields: [appLedgerId], references: [key])
+  appLedger             AppLedgerSettings       @relation(fields: [appLedgerId], references: [key])
   appLedgerId           DefaultEnum             @map("app_ledger_id")
 
   @@map("app_wallet")
