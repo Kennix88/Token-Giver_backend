@@ -55,57 +55,29 @@ model ReferralSettings {
 }
 
 model AppLedgerSettings {
-  key            DefaultEnum @id @default(DEFAULT)
-  profitPercent  Float       @default(0.3) @map("profit_percent")
-  airdropPercent Float       @default(0.3) @map("airdrop_percent")
-  courcePercent  Float       @default(0.2) @map("cource_percent")
-  prizesPrecent  Float       @default(0.2) @map("prizes_precent")
-
-  wallets AppWallets[]
+  key               DefaultEnum @id @default(DEFAULT)
+  profitPercent     Float       @default(0.3) @map("profit_percent")
+  airdropPercent    Float       @default(0.3) @map("airdrop_percent")
+  commissionPercent Float       @default(0.2) @map("commission_percent")
+  prizesPrecent     Float       @default(0.2) @map("prizes_precent")
 
   @@map("app_ledger_settings")
 }
 
 model AppWallets {
-  category AppWalletCategoryEnum @id
-  type     AppWalletTypeEnum
-  amount   Float                 @default(0)
+  id                 String   @id @default(uuid())
+  currency           Currency @relation(fields: [currencyId], references: [id])
+  currencyId         String   @map("currency_id")
+  total_balance      Float    @default(0) @map("total_balance")
+  referral_balance   Float    @default(0) @map("referral_balance")
+  airdrop_balance    Float    @default(0) @map("airdrop_balance")
+  commission_balance Float    @default(0) @map("commission_balance")
+  prizes_balance     Float    @default(0) @map("prizes_balance")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  appWalletTransactions AppWalletTransactions[]
-  appLedger             AppLedgerSettings       @relation(fields: [appLedgerId], references: [key])
-  appLedgerId           DefaultEnum             @map("app_ledger_id")
-
-  @@map("app_wallet")
-}
-
-enum AppWalletCategoryEnum {
-  PROFIT
-  AIRDROP
-  COMMISSION
-  REFERRAL
-}
-
-enum AppWalletTypeEnum {
-  STARS
-  TON
-  USDT
-}
-
-model AppWalletTransactions {
-  id     String                    @id @default(uuid())
-  type   WalletTransactionTypeEnum
-  amount Float
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  appWallets   AppWallets            @relation(fields: [appWalletsId], references: [category])
-  appWalletsId AppWalletCategoryEnum @map("app_wallets_id")
-
-  @@map("app_wallet_transactions")
+  @@map("app_wallets")
 }
 
 model AirdropLeaderboard {
@@ -122,8 +94,7 @@ model AirdropLeaderboard {
 }
 
 model AirdropPrizes {
-  id     String            @id @default(uuid())
-  type   AppWalletTypeEnum
+  id     String @id @default(uuid())
   amount Float
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -529,7 +500,8 @@ model Currency {
   key        String  @unique
   iso4217Num String? @unique @map("iso_4217_num")
 
-  payments Payments[]
+  payments   Payments[]
+  appWallets AppWallets[]
 
   @@map("currency")
 }
