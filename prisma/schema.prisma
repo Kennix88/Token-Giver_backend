@@ -80,10 +80,34 @@ model AppWallets {
   @@map("app_wallets")
 }
 
+model Prizes {
+  id     String         @id @default(uuid())
+  type   WalletTypeEnum
+  amount Float
+
+  referralPrizes     ReferralPrizes?         @relation(fields: [referralPrizesType], references: [type])
+  referralPrizesType ReferralPrizesTypeEnum? @map("referral_prizes_type")
+
+  daysReward                DaysReward?              @relation(fields: [daysRewardId], references: [day])
+  daysRewardId              Int?                     @map("days_reward_id")
+  vipSubscriptionSettings   VIPSubscriptionSettings? @relation(fields: [vipSubscriptionSettingsId], references: [type])
+  vipSubscriptionSettingsId VIPSubscriptionTypeEnum? @map("vip_subscription_settings_id")
+  shop                      Shop?                    @relation(fields: [shopId], references: [id])
+  shopId                    String?                  @map("shop_id")
+  leaderboardPlaces         LeaderboardPlaces?       @relation(fields: [leaderboardPlacesId], references: [id])
+  leaderboardPlacesId       String?                  @map("leaderboard_places_id")
+  leaderboardPrizes         LeaderboardPrizes?       @relation(fields: [leaderboardPrizesId], references: [id])
+  leaderboardPrizesId       String?                  @map("leaderboard_prizes_id")
+
+  @@map("prizes")
+}
+
 model League {
   type     LeagueTypeEnum @id
   minValue Int
   maxValue Int
+
+  leaderboardPlaces LeaderboardPlaces[]
 
   @@map("leagues")
 }
@@ -105,39 +129,58 @@ enum LeagueTypeEnum {
   STARSTEEL
 }
 
-model Prizes {
-  id     String         @id @default(uuid())
-  type   WalletTypeEnum
-  amount Float
+model LeaderboardPlaces {
+  id            String   @id @default(uuid())
+  place         Int
+  previousPlace Int      @map("previous_place")
+  score         Float
+  isRewarded    Boolean  @default(false) @map("is_rewarded")
+  prizes        Prizes[]
 
-  referralPrizes     ReferralPrizes?         @relation(fields: [referralPrizesType], references: [type])
-  referralPrizesType ReferralPrizesTypeEnum? @map("referral_prizes_type")
+  user          User?           @relation(fields: [userId], references: [id])
+  userId        String?         @unique @map("user_id")
+  leaderboard   Leaderboards    @relation(fields: [leaderboardId], references: [id])
+  leaderboardId String          @map("leaderboard_id")
+  league        League?         @relation(fields: [leagueId], references: [type])
+  leagueId      LeagueTypeEnum? @map("league_id")
 
-  daysReward                DaysReward?              @relation(fields: [daysRewardId], references: [day])
-  daysRewardId              Int?                     @map("days_reward_id")
-  vipSubscriptionSettings   VIPSubscriptionSettings? @relation(fields: [vipSubscriptionSettingsId], references: [type])
-  vipSubscriptionSettingsId VIPSubscriptionTypeEnum? @map("vip_subscription_settings_id")
-  shop                      Shop?                    @relation(fields: [shopId], references: [id])
-  shopId                    String?                  @map("shop_id")
-
-  @@map("prizes")
+  @@map("leaderboard_places")
 }
 
-// model Leaderboards {
-//   id            String  @id @default(uuid())
-//   place         Int     @default(1)
-//   previousPlace Int     @default(1) @map("previous_place")
-//   score         Float
-//   isRewarded    Boolean @default(false) @map("is_rewarded")
-//
-//   createdAt DateTime @default(now()) @map("created_at")
-//   updatedAt DateTime @updatedAt @map("updated_at")
-//
-// user   User   @relation(fields: [userId], references: [id])
-// userId String @unique @map("user_id")
-//
-//   @@map("leaderboards")
-// }
+model Leaderboards {
+  id     String              @id @default(uuid())
+  type   LeaderboardTypeEnum
+  places LeaderboardPlaces[]
+  result Json?               @db.JsonB
+
+  startedAt DateTime? @map("started_at")
+  endedAt   DateTime? @map("ended_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  currency   Currency @relation(fields: [currencyId], references: [id])
+  currencyId String   @map("currency_id")
+
+  @@map("leaderboards")
+}
+
+model LeaderboardPrizes {
+  id         String   @id @default(uuid())
+  startPlace Int      @map("start_place")
+  endPlace   Int      @map("end_place")
+  prizes     Prizes[]
+
+  @@map("leaderboard_prizes")
+}
+
+enum LeaderboardTypeEnum {
+  MAIN
+  AP
+  AIRDROP
+  REFERRAL
+  SQUAD
+  MAIN_SQUAD
+}
 
 model KingTheHillSettings {
   key                DefaultEnum @id @default(DEFAULT)
@@ -236,19 +279,20 @@ model User {
   banExpiredAt  DateTime? @map("banned_expired_at")
   deletedAt     DateTime? @map("deleted_at")
 
-  wallets           UserWallets[]
-  socialLinks       SocialLinks[]
-  payments          Payments[]
-  referrals         Referral[]        @relation("referral")
-  inviters          Referral[]        @relation("inviter")
-  kingTheHill       KingTheHill?
-  telegramData      UserTelegramData? @relation(fields: [telegramDataId], references: [id])
-  telegramDataId    String?           @unique @map("telegram_data_id")
-  vipSubscription   VIPSubscription?  @relation(fields: [vipSubscriptionId], references: [id])
-  vipSubscriptionId String?           @unique @map("vip_subscription_id")
-  language          Language          @relation(fields: [languageId], references: [id])
-  languageId        String            @map("language_id")
-  tasksProgress     TaskProgress[]
+  wallets            UserWallets[]
+  socialLinks        SocialLinks[]
+  payments           Payments[]
+  referrals          Referral[]          @relation("referral")
+  inviters           Referral[]          @relation("inviter")
+  kingTheHill        KingTheHill?
+  telegramData       UserTelegramData?   @relation(fields: [telegramDataId], references: [id])
+  telegramDataId     String?             @unique @map("telegram_data_id")
+  vipSubscription    VIPSubscription?    @relation(fields: [vipSubscriptionId], references: [id])
+  vipSubscriptionId  String?             @unique @map("vip_subscription_id")
+  language           Language            @relation(fields: [languageId], references: [id])
+  languageId         String              @map("language_id")
+  tasksProgress      TaskProgress[]
+  leaderboardsPlaces LeaderboardPlaces[]
 
   @@map("users")
 }
@@ -379,8 +423,9 @@ model Currency {
   key        String  @unique
   iso4217Num String? @unique @map("iso_4217_num")
 
-  payments   Payments[]
-  appWallets AppWallets[]
+  payments    Payments[]
+  appWallets  AppWallets[]
+  leadrboards Leaderboards[]
 
   @@map("currency")
 }
