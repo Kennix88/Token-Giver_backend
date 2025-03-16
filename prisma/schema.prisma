@@ -80,38 +80,10 @@ model AppWallets {
   @@map("app_wallets")
 }
 
-model AirdropLeaderboard {
-  id            String          @id @default(uuid())
-  place         Int             @default(1)
-  previousPlace Int             @default(1) @map("previous_place")
-  score         Float
-  airdrop       AirdropPrizes[]
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("airdrop_leaderboard")
-}
-
-model AirdropPrizes {
-  id     String @id @default(uuid())
-  amount Float
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  airdropLeaderboard   AirdropLeaderboard @relation(fields: [airdropLeaderboardId], references: [id])
-  airdropLeaderboardId String             @unique @map("airdrop_leaderboard_id")
-
-  @@map("airdrop_prizes")
-}
-
 model League {
   type     LeagueTypeEnum @id
   minValue Int
   maxValue Int
-
-  mainLeaderboard MainLeaderboard[]
 
   @@map("leagues")
 }
@@ -133,32 +105,10 @@ enum LeagueTypeEnum {
   STARSTEEL
 }
 
-model MainLeaderboard {
-  id            String @id @default(uuid())
-  place         Int    @default(1)
-  previousPlace Int    @default(1) @map("previous_place")
-  score         Float
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  league     League         @relation(fields: [leagueType], references: [type])
-  leagueType LeagueTypeEnum
-  user       User           @relation(fields: [userId], references: [id])
-  userId     String         @unique @map("user_id")
-
-  @@map("main_leaderboard")
-}
-
 model Prizes {
   id     String         @id @default(uuid())
   type   WalletTypeEnum
   amount Float
-
-  apLeaderboardPrizes         APLeaderboardPrizes?       @relation(fields: [apLeaderboardPrizesId], references: [id])
-  apLeaderboardPrizesId       String?                    @unique @map("ap_leaderboard_prizes_id")
-  referralLeaderboardPrizes   ReferralLeaderboardPrizes? @relation(fields: [referralLeaderboardPrizesId], references: [id])
-  referralLeaderboardPrizesId String?                    @unique @map("referral_leaderboard_prizes_id")
 
   referralPrizes     ReferralPrizes?         @relation(fields: [referralPrizesType], references: [type])
   referralPrizesType ReferralPrizesTypeEnum? @map("referral_prizes_type")
@@ -173,89 +123,21 @@ model Prizes {
   @@map("prizes")
 }
 
-model APLeaderboard {
-  id            String  @id @default(uuid())
-  place         Int     @default(1)
-  previousPlace Int     @default(1) @map("previous_place")
-  score         Float
-  isRewarded    Boolean @default(false) @map("is_rewarded")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique @map("user_id")
-
-  @@map("ap_leaderboard")
-}
-
-model APLeaderboardSeason {
-  id String @id @default(uuid())
-
-  startedAt DateTime
-  endedAt   DateTime
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  results Json?                 @db.JsonB
-  prizes  APLeaderboardPrizes[]
-
-  @@map("ap_leaderboard_season")
-}
-
-model APLeaderboardPrizes {
-  id         String @id @default(uuid())
-  startPlace Int    @default(1) @map("start_place")
-  endPlace   Int    @default(10) @map("end_place")
-
-  prizes                Prizes[]
-  apLeaderboardSeason   APLeaderboardSeason @relation(fields: [apLeaderboardSeasonId], references: [id])
-  apLeaderboardSeasonId String              @unique @map("ap_leaderboard_season_id")
-
-  @@map("ap_leaderboard_prizes")
-}
-
-model ReferralLeaderboardSeason {
-  id String @id @default(uuid())
-
-  startedAt DateTime @map("started_at")
-  endedAt   DateTime @map("ended_at")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  results Json?                       @db.JsonB
-  prizes  ReferralLeaderboardPrizes[]
-
-  @@map("referral_leaderboard_season")
-}
-
-model ReferralLeaderboardPrizes {
-  id         String @id @default(uuid())
-  startPlace Int    @default(1) @map("start_place")
-  endPlace   Int    @default(10) @map("end_place")
-
-  prizes                      Prizes[]
-  referralLeaderboardSeason   ReferralLeaderboardSeason @relation(fields: [referralLeaderboardSeasonId], references: [id])
-  referralLeaderboardSeasonId String                    @unique @map("referral_leaderboard_season_id")
-
-  @@map("referral_leaderboard_prizes")
-}
-
-model ReferralLeaderboard {
-  id            String  @id @default(uuid())
-  place         Int     @default(1)
-  previousPlace Int     @default(1) @map("previous_place")
-  score         Float
-  isRewarded    Boolean @default(false) @map("is_rewarded")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique @map("user_id")
-
-  @@map("referral_leaderboard")
-}
+// model Leaderboards {
+//   id            String  @id @default(uuid())
+//   place         Int     @default(1)
+//   previousPlace Int     @default(1) @map("previous_place")
+//   score         Float
+//   isRewarded    Boolean @default(false) @map("is_rewarded")
+//
+//   createdAt DateTime @default(now()) @map("created_at")
+//   updatedAt DateTime @updatedAt @map("updated_at")
+//
+// user   User   @relation(fields: [userId], references: [id])
+// userId String @unique @map("user_id")
+//
+//   @@map("leaderboards")
+// }
 
 model KingTheHillSettings {
   key                DefaultEnum @id @default(DEFAULT)
@@ -354,22 +236,19 @@ model User {
   banExpiredAt  DateTime? @map("banned_expired_at")
   deletedAt     DateTime? @map("deleted_at")
 
-  wallets             UserWallets[]
-  socialLinks         SocialLinks[]
-  payments            Payments[]
-  referrals           Referral[]           @relation("referral")
-  inviters            Referral[]           @relation("inviter")
-  kingTheHill         KingTheHill?
-  telegramData        UserTelegramData?    @relation(fields: [telegramDataId], references: [id])
-  telegramDataId      String?              @unique @map("telegram_data_id")
-  vipSubscription     VIPSubscription?     @relation(fields: [vipSubscriptionId], references: [id])
-  vipSubscriptionId   String?              @unique @map("vip_subscription_id")
-  language            Language             @relation(fields: [languageId], references: [id])
-  languageId          String               @map("language_id")
-  apLeaderboard       APLeaderboard?
-  mainLeaderboard     MainLeaderboard?
-  referralLeaderboard ReferralLeaderboard?
-  tasksProgress       TaskProgress[]
+  wallets           UserWallets[]
+  socialLinks       SocialLinks[]
+  payments          Payments[]
+  referrals         Referral[]        @relation("referral")
+  inviters          Referral[]        @relation("inviter")
+  kingTheHill       KingTheHill?
+  telegramData      UserTelegramData? @relation(fields: [telegramDataId], references: [id])
+  telegramDataId    String?           @unique @map("telegram_data_id")
+  vipSubscription   VIPSubscription?  @relation(fields: [vipSubscriptionId], references: [id])
+  vipSubscriptionId String?           @unique @map("vip_subscription_id")
+  language          Language          @relation(fields: [languageId], references: [id])
+  languageId        String            @map("language_id")
+  tasksProgress     TaskProgress[]
 
   @@map("users")
 }
