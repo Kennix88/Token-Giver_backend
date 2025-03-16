@@ -26,17 +26,30 @@ model Settings {
   @@map("settings")
 }
 
-model ReferralSettings {
-  key              DefaultEnum @id @default(DEFAULT)
-  broPrizers       Prizes[]    @relation("broPrizes")
-  sleepPrizes      Prizes[]    @relation("sleepPrizes")
-  newPrizes        Prizes[]    @relation("newPrizes")
-  newPremiumPrizes Prizes[]    @relation("newPremiumPrizes")
-  newLvlUpPrizes   Prizes[]    @relation("newLvlUpPrizes")
+model ReferralPrizes {
+  type   ReferralPrizesTypeEnum @id
+  prizes Prizes[]
 
-  taskPercent    Float @default(0.05) @map("task_percent")
-  gamePercent    Float @default(0.01) @map("game_percent")
-  paymentPercent Float @default(0.10) @map("payment_percent")
+  referralSettings    ReferralSettings @relation(fields: [referralSettingsKey], references: [key])
+  referralSettingsKey DefaultEnum      @map("referral_settings_key")
+
+  @@map("referral_prizes")
+}
+
+enum ReferralPrizesTypeEnum {
+  BRO
+  SLEEP
+  NEW_USER
+  NEW_PREMIUM_USER
+  NEW_LVL_UP
+}
+
+model ReferralSettings {
+  key            DefaultEnum      @id @default(DEFAULT)
+  prizers        ReferralPrizes[]
+  taskPercent    Float            @default(0.05) @map("task_percent")
+  gamePercent    Float            @default(0.01) @map("game_percent")
+  paymentPercent Float            @default(0.10) @map("payment_percent")
 
   @@map("referral_settings")
 }
@@ -186,16 +199,8 @@ model Prizes {
   referralLeaderboardPrizes   ReferralLeaderboardPrizes? @relation(fields: [referralLeaderboardPrizesId], references: [id])
   referralLeaderboardPrizesId String?                    @unique @map("referral_leaderboard_prizes_id")
 
-  referralBroPrizes          ReferralSettings? @relation("broPrizes", fields: [referralBroPrizesId], references: [key])
-  referralBroPrizesId        DefaultEnum?      @map("referral_bro_prizes_id")
-  referralSleepPrizes        ReferralSettings? @relation("sleepPrizes", fields: [referralSleepPrizesId], references: [key])
-  referralSleepPrizesId      DefaultEnum?      @map("referral_sleep_prizes_id")
-  referralNewPrizes          ReferralSettings? @relation("newPrizes", fields: [referralNewPrizesId], references: [key])
-  referralNewPrizesId        DefaultEnum?      @map("referral_new_prizes_id")
-  referralNewPremiumPrizes   ReferralSettings? @relation("newPremiumPrizes", fields: [referralNewPremiumPrizesId], references: [key])
-  referralNewPremiumPrizesId DefaultEnum?      @map("referral_new_premium_prizes_id")
-  referralNewLvlUpPrizes     ReferralSettings? @relation("newLvlUpPrizes", fields: [referralNewLvlUpPrizesId], references: [key])
-  referralNewLvlUpPrizesId   DefaultEnum?      @map("referral_new_lvl_up_prizes_id")
+  referralPrizes     ReferralPrizes?         @relation(fields: [referralPrizesType], references: [type])
+  referralPrizesType ReferralPrizesTypeEnum? @map("referral_prizes_type")
 
   daysReward                DaysReward?              @relation(fields: [daysRewardId], references: [day])
   daysRewardId              Int?                     @map("days_reward_id")
