@@ -138,7 +138,7 @@ model LeaderboardPlaces {
   isRewarded    Boolean  @default(false) @map("is_rewarded")
   prizes        Prizes[]
 
-  user          User?           @relation(fields: [userId], references: [id])
+  user          Users?          @relation(fields: [userId], references: [id])
   userId        String?         @unique @map("user_id")
   leaderboard   Leaderboards    @relation(fields: [leaderboardId], references: [id])
   leaderboardId String          @map("leaderboard_id")
@@ -201,7 +201,7 @@ model KingTheHill {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // transactions Transactions[]
-  user   User   @relation(fields: [userId], references: [id])
+  user   Users  @relation(fields: [userId], references: [id])
   userId String @unique @map("user_id")
 
   @@map("king_the_hill")
@@ -224,7 +224,7 @@ model UserTelegramData {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user User?
+  user Users?
 
   @@map("user_telegram_data")
 }
@@ -232,26 +232,25 @@ model UserTelegramData {
 model Referral {
   id         String  @id @default(uuid())
   isMain     Boolean @default(true)
-  inviter    User    @relation("inviter", fields: [inviterId], references: [id])
+  inviter    Users   @relation("inviter", fields: [inviterId], references: [id])
   inviterId  String  @map("inviter_id")
-  referral   User    @relation("referral", fields: [referralId], references: [id])
+  referral   Users   @relation("referral", fields: [referralId], references: [id])
   referralId String  @map("referral_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 }
 
-model User {
-  id               String       @id @default(uuid())
-  description      String?      @db.VarChar(100)
-  telegramId       String       @unique @map("telegram_id")
-  tonWallet        String?      @unique @map("ton_wallet")
-  isInited         Boolean      @default(false)
-  role             UserRoleEnum @default(USER)
-  isBanned         Boolean      @default(false)
-  isDeleted        Boolean      @default(false)
-  gameSessionCount Int          @default(1)
-  level            Int          @default(1)
+model Users {
+  id               String  @id @default(uuid())
+  description      String? @db.VarChar(100)
+  telegramId       String  @unique @map("telegram_id")
+  tonWallet        String? @unique @map("ton_wallet")
+  isInited         Boolean @default(false)
+  isBanned         Boolean @default(false)
+  isDeleted        Boolean @default(false)
+  gameSessionCount Int     @default(1)
+  level            Int     @default(1)
 
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
@@ -259,6 +258,8 @@ model User {
   banExpiredAt  DateTime? @map("banned_expired_at")
   deletedAt     DateTime? @map("deleted_at")
 
+  role               Roles               @relation(fields: [roleId], references: [key])
+  roleId             UserRoleEnum        @default(USER) @map("role_id")
   wallets            UserWallets[]
   socialLinks        SocialLinks[]
   payments           Payments[]
@@ -282,7 +283,7 @@ model SocialLinks {
   link String
   type SocialLinkTypeEnum
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   Users  @relation(fields: [userId], references: [id])
   userId String @unique @map("user_id")
 }
 
@@ -302,6 +303,16 @@ enum SocialLinkTypeEnum {
   BOOSTY
 }
 
+model Roles {
+  key   UserRoleEnum @id
+  level Int          @default(1)
+  // privileges
+
+  users Users[]
+
+  @@map("roles")
+}
+
 enum UserRoleEnum {
   SUPER_ADMIN
   ADMIN
@@ -318,7 +329,7 @@ model UserWallets {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   Users  @relation(fields: [userId], references: [id])
   userId String @map("user_id")
 
   walletTransactions WalletTransactions[]
@@ -389,7 +400,7 @@ model Language {
   iso6392    String @unique @map("iso_639_2")
   iso6393    String @unique @map("iso_639_3")
 
-  users           User[]
+  users           Users[]
   taskTitles      TaskTitles[]
   taskDecriptions TaskDecriptions[]
 
@@ -464,7 +475,7 @@ model VIPSubscription {
   updatedAt DateTime @updatedAt @map("updated_at")
   expiredAt DateTime @map("expired_at")
 
-  user     User?
+  user     Users?
   payments Payments[]
 
   @@map("vip_subscription")
@@ -492,7 +503,7 @@ model Payments {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user              User             @relation(fields: [userId], references: [id])
+  user              Users            @relation(fields: [userId], references: [id])
   userId            String           @map("user_id")
   currency          Currency         @relation(fields: [currencyId], references: [id])
   currencyId        String           @map("currency_id")
@@ -670,7 +681,7 @@ model TaskProgress {
 
   task   Task   @relation(fields: [taskId], references: [id])
   taskId String @map("task_id")
-  user   User   @relation(fields: [userId], references: [id])
+  user   Users  @relation(fields: [userId], references: [id])
   userId String @map("user_id")
 
   @@map("task_progress")
