@@ -81,9 +81,10 @@ model AppWallets {
 }
 
 model Prizes {
-  id     String         @id @default(uuid())
-  type   WalletTypeEnum
-  amount Float
+  id         String    @id @default(uuid())
+  amount     Float
+  currency   Currency? @relation(fields: [currencyId], references: [id])
+  currencyId String?   @map("currency_id")
 
   referralPrizes     ReferralPrizes?         @relation(fields: [referralPrizesType], references: [type])
   referralPrizesType ReferralPrizesTypeEnum? @map("referral_prizes_type")
@@ -426,6 +427,7 @@ model Currency {
   payments    Payments[]
   appWallets  AppWallets[]
   leadrboards Leaderboards[]
+  prizes      Prizes[]
 
   @@map("currency")
 }
