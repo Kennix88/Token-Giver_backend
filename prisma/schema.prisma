@@ -191,42 +191,20 @@ model KingTheHillSettings {
 }
 
 model KingTheHill {
-  id         String                    @id @default(uuid())
-  walletType KingTheHillWalletTypeEnum @map("wallet_type")
-  isActive   Boolean                   @default(true) @map("is_active")
-  bank       Float                     @default(0)
+  id         String   @id @default(uuid())
+  currency   Currency @relation(fields: [currencyId], references: [id])
+  currencyId String   @map("currency_id")
+  bank       Float    @default(0)
 
   endedAt   DateTime @map("ended_at")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  transactions KingTheHillTransactions[]
-  user         User                      @relation(fields: [userId], references: [id])
-  userId       String                    @unique @map("user_id")
+  // transactions Transactions[]
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique @map("user_id")
 
   @@map("king_the_hill")
-}
-
-model KingTheHillTransactions {
-  id         String                    @id @default(uuid())
-  amount     Float
-  walletType KingTheHillWalletTypeEnum @map("wallet_type")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  kingTheHill   KingTheHill @relation(fields: [kingTheHillId], references: [id])
-  kingTheHillId String      @unique @map("king_the_hill_id")
-
-  @@map("king_the_hill_transactions")
-}
-
-enum KingTheHillWalletTypeEnum {
-  COINS
-  GEMS
-  STARS
-  TON
-  USDT
 }
 
 model UserTelegramData {
@@ -428,6 +406,7 @@ model Currency {
   appWallets  AppWallets[]
   leadrboards Leaderboards[]
   prizes      Prizes[]
+  kingTheHill KingTheHill[]
 
   @@map("currency")
 }
